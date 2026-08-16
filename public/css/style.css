@@ -550,7 +550,10 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   padding: clamp(10px, 4vw, 20px);
-  z-index: 80;
+  /* Harus lebih tinggi dari .admin-drawer-overlay (z-index: 90) supaya modal
+     konfirmasi (Approve/Tolak) tetap bisa diklik saat dibuka di atas drawer
+     detail transaksi yang masih terbuka di belakangnya. */
+  z-index: 100;
 }
 
 .modal-overlay.is-open { display: flex; }
