@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — marketplace.css
+   KENARRZ MARKET — marketplace.css
    Hero, ticket-stub account card, grid, filter, product gallery
    ============================================================ */
 
@@ -11,7 +11,7 @@
   padding: clamp(32px, 8vw, 56px) 0 clamp(40px, 9vw, 64px);
   border-bottom: var(--border-w) solid var(--ink);
   background:
-    radial-gradient(circle at 85% 20%, rgba(47, 93, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 85% 20%, rgba(30, 28, 24, 0.06), transparent 55%),
     var(--bg);
   overflow: hidden;
 }
@@ -260,7 +260,7 @@
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--ink-soft);
-  background: repeating-linear-gradient(135deg, var(--bg-raised), var(--bg-raised) 10px, #e7e5d9 10px, #e7e5d9 20px);
+  background: repeating-linear-gradient(135deg, var(--bg-raised), var(--bg-raised) 10px, #e2ded4 10px, #e2ded4 20px);
 }
 
 .account-card__badges {
@@ -291,7 +291,7 @@
 /* Ticket perforation divider */
 .account-card__perforation {
   height: 0;
-  border-top: 2px dashed #c8c6b8;
+  border-top: 2px dashed #b8b2a2;
   position: relative;
   margin: 0 14px;
 }
@@ -364,6 +364,61 @@
   margin-top: 4px;
 }
 
+.account-card__promo-stamp {
+  position: absolute;
+  top: 46px;
+  right: -34px;
+  transform: rotate(45deg);
+  background: var(--danger);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 34px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.price-block--discount {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.price-block__promo-label {
+  display: inline-block;
+  background: var(--danger);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-bottom: 2px;
+}
+
+.price-block__original {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+
+.price-block__final {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.account-card__price .price-block__final { font-size: 1.25rem; }
+
 .account-card__actions {
   display: flex;
   gap: 8px;
@@ -378,7 +433,7 @@
 
 /* Skeleton card */
 .account-card-skeleton {
-  border: var(--border-w-sm) solid #d9d7c9;
+  border: var(--border-w-sm) solid #d3cec1;
   border-radius: 8px;
   overflow: hidden;
   background: var(--card);
@@ -431,7 +486,7 @@
 .sold-section {
   margin-top: 48px;
   padding-top: 28px;
-  border-top: 2px dashed #c8c6b8;
+  border-top: 2px dashed #b8b2a2;
 }
 
 .sold-section__head {
@@ -608,7 +663,7 @@
 .product-info__actions .btn { flex: 1; }
 
 .product-block {
-  border-top: 2px dashed #c8c6b8;
+  border-top: 2px dashed #b8b2a2;
   padding-top: 18px;
   margin-top: 18px;
 }
@@ -695,7 +750,7 @@
 }
 
 .payment-warning {
-  background: #fff2cf;
+  background: #e9e5da;
   border: var(--border-w-sm) solid var(--border);
   border-radius: var(--radius);
   padding: 12px 14px;
@@ -847,8 +902,54 @@
 }
 
 .cta-band h2 { color: #fff; margin-bottom: 4px; }
-.cta-band p { color: #c8c6c0; margin: 0; }
+.cta-band p { color: #b6b2a8; margin: 0; }
 
 @media (max-width: 700px) {
   .cta-band { flex-direction: column; text-align: center; }
 }
+
+/* ── URL tracking block (wajib disimpan pembeli) ── */
+.payment-block--url-tracking {
+  background: var(--accent-soft, #e6e2d9);
+  border: var(--border-w) solid var(--ink);
+}
+
+.payment-url-box {
+  display: flex;
+}
+
+.payment-url-box input {
+  width: 100%;
+  border: var(--border-w-sm) solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  background: #fff;
+}
+
+/* ── Timeline status transaksi ── */
+.tx-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tx-timeline__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 0.88rem;
+}
+
+.tx-timeline__icon {
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.tx-timeline__item.is-done { color: var(--success); }
+.tx-timeline__item.is-current { color: var(--ink); font-weight: 700; }
+.tx-timeline__item.is-pending { color: var(--ink-soft); opacity: 0.6; }
+.tx-timeline__item.is-rejected { color: var(--danger); font-weight: 700; }
