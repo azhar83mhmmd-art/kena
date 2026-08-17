@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — payment.js
+   KENARRZ MARKET — payment.js
    Halaman pembayaran QRIS DANA Bisnis MANUAL. Website ini TIDAK
    PERNAH mengklaim pembayaran otomatis berhasil — status PAID
    hanya ditetapkan oleh admin. Halaman ini:
@@ -52,6 +52,144 @@
     EXPIRED: 'badge--expired',
     COMPLETED: 'badge--paid',
   };
+
+  const STATUS_EMOJI = {
+    PENDING_PAYMENT: '🟡',
+    PROOF_SUBMITTED: '🔵',
+    VERIFYING: '🔵',
+    PAID: '🟢',
+    REJECTED: '🔴',
+    EXPIRED: '⚫',
+  };
+
+  // ── URL Tracking: tampilkan & siapkan tombol salin/bagikan ──
+  function setupUrlTracking() {
+    const urlInput = document.querySelector('[data-payment-url-input]');
+    const fullUrl = window.location.href;
+    if (urlInput) urlInput.value = fullUrl;
+
+    document.querySelector('[data-copy-url-btn]')?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(fullUrl);
+        KENARRZ.toast('URL transaksi berhasil disalin.', 'success');
+      } catch (e) {
+        urlInput?.select();
+        KENARRZ.toast('Gagal menyalin otomatis — silakan salin manual.', 'error');
+      }
+    });
+
+    const shareBtn = document.querySelector('[data-share-url-btn]');
+    if (shareBtn && navigator.share) {
+      shareBtn.style.display = '';
+      shareBtn.addEventListener('click', async () => {
+        try {
+          await navigator.share({ title: 'URL Transaksi KENARRZ MARKET', url: fullUrl });
+        } catch (e) {
+          /* dibatalkan user, abaikan */
+        }
+      });
+    }
+  }
+
+  // ── Timeline status pesanan (spek: 5 tahap) ──────────────────
+  function renderTimeline(tx) {
+    const el = document.querySelector('[data-payment-timeline]');
+    if (!el) return;
+
+    if (tx.payment_status === 'REJECTED') {
+      el.innerHTML = `
+        <li class="tx-timeline__item is-done"><span class="tx-timeline__icon">✓</span> Pesanan dibuat</li>
+        <li class="tx-timeline__item is-done"><span class="tx-timeline__icon">✓</span> Bukti pembayaran dikirim</li>
+        <li class="tx-timeline__item is-rejected"><span class="tx-timeline__icon">✕</span> Pembayaran ditolak admin</li>`;
+      return;
+    }
+    if (tx.payment_status === 'EXPIRED') {
+      el.innerHTML = `
+        <li class="tx-timeline__item is-done"><span class="tx-timeline__icon">✓</span> Pesanan dibuat</li>
+        <li class="tx-timeline__item is-rejected"><span class="tx-timeline__icon">⏱</span> Kedaluwarsa — pembayaran tidak dikonfirmasi tepat waktu</li>`;
+      return;
+    }
+
+    const steps = [
+      { key: 'created', label: 'Pesanan dibuat' },
+      { key: 'awaiting', label: 'Menunggu pembayaran' },
+      { key: 'proof', label: 'Bukti pembayaran dikirim' },
+      { key: 'verify', label: 'Verifikasi admin' },
+      { key: 'done', label: 'Pesanan selesai' },
+    ];
+
+    let currentIdx = 0;
+    if (tx.payment_status === 'PENDING_PAYMENT') currentIdx = 1;
+    else if (['PROOF_SUBMITTED', 'VERIFYING'].includes(tx.payment_status)) currentIdx = 2;
+    else if (tx.payment_status === 'PAID' && tx.transaction_status !== 'COMPLETED') currentIdx = 3;
+    else if (tx.payment_status === 'PAID' && tx.transaction_status === 'COMPLETED') currentIdx = 4;
+
+    el.innerHTML = steps
+      .map((step, idx) => {
+        let cls = 'is-pending';
+        let icon = '○';
+        if (idx < currentIdx) {
+          cls = 'is-done';
+          icon = '✓';
+        } else if (idx === currentIdx) {
+          cls = 'is-current';
+          icon = '●';
+        }
+        return `<li class="tx-timeline__item ${cls}"><span class="tx-timeline__icon">${icon}</span> ${step.label}</li>`;
+      })
+      .join('');
+  }
+
+  // ── AKUN ANDA: hanya diambil & ditampilkan setelah COMPLETED ─
+  async function renderCredentialsIfCompleted(tx) {
+    const block = document.querySelector('[data-payment-credentials-block]');
+    if (!block) return;
+    if (tx.payment_status !== 'PAID' || tx.transaction_status !== 'COMPLETED') {
+      block.style.display = 'none';
+      return;
+    }
+    block.style.display = '';
+    const loadingEl = block.querySelector('[data-payment-credentials-loading]');
+    const emailInput = block.querySelector('[data-cred-email]');
+    const passwordInput = block.querySelector('[data-cred-password]');
+    if (emailInput.dataset.loaded === '1') return; // sudah pernah dimuat, jangan fetch ulang tiap poll
+    try {
+      const { data, error } = await supabaseClient.rpc('get_purchased_account_credentials', { p_invoice_id: invoiceId });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      emailInput.value = row?.account_email || '-';
+      passwordInput.value = row?.account_password || '-';
+      emailInput.dataset.loaded = '1';
+      if (loadingEl) loadingEl.style.display = 'none';
+    } catch (e) {
+      if (loadingEl) loadingEl.textContent = 'Data akun belum dapat dimuat. Silakan refresh halaman.';
+    }
+  }
+
+  document.querySelector('[data-toggle-cred-password-btn]')?.addEventListener('click', (e) => {
+    const input = document.querySelector('[data-cred-password]');
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    e.target.textContent = isHidden ? 'Sembunyikan Password' : 'Tampilkan Password';
+  });
+  document.querySelector('[data-copy-email-btn]')?.addEventListener('click', async () => {
+    const val = document.querySelector('[data-cred-email]').value;
+    try {
+      await navigator.clipboard.writeText(val);
+      KENARRZ.toast('Email berhasil disalin.', 'success');
+    } catch (e) {
+      KENARRZ.toast('Gagal menyalin.', 'error');
+    }
+  });
+  document.querySelector('[data-copy-password-btn]')?.addEventListener('click', async () => {
+    const val = document.querySelector('[data-cred-password]').value;
+    try {
+      await navigator.clipboard.writeText(val);
+      KENARRZ.toast('Password berhasil disalin.', 'success');
+    } catch (e) {
+      KENARRZ.toast('Gagal menyalin.', 'error');
+    }
+  });
 
   function extFromMime(mime) {
     switch (mime) {
@@ -119,9 +257,9 @@
   }
 
   async function loadQrisAndSettings() {
-    const settings = (await ARRZ.loadSettings()) || {};
+    const settings = (await KENARRZ.loadSettings()) || {};
     const merchantEl = document.querySelector('[data-payment-merchant-name]');
-    if (merchantEl) merchantEl.textContent = settings.merchant_name || settings.site_name || 'ARRZ MARKET';
+    if (merchantEl) merchantEl.textContent = settings.merchant_name || settings.site_name || 'KENARRZ MARKET';
 
     const danaNumberRow = document.querySelector('[data-payment-dana-number-row]');
     const danaNumberEl = document.querySelector('[data-payment-dana-number]');
@@ -134,7 +272,7 @@
     if (settings.qris_image_path) {
       const { data: pub } = supabaseClient.storage.from('payment-assets').getPublicUrl(settings.qris_image_path);
       if (pub?.publicUrl) {
-        qrisWrap.innerHTML = `<img src="${ARRZ.escapeAttr(pub.publicUrl)}" alt="QRIS DANA Bisnis ARRZ MARKET" />`;
+        qrisWrap.innerHTML = `<img src="${KENARRZ.escapeAttr(pub.publicUrl)}" alt="QRIS DANA Bisnis KENARRZ MARKET" />`;
       }
     }
 
@@ -144,7 +282,7 @@
       .split('\n')
       .map((line) => line.replace(/^\d+\.\s*/, '').trim())
       .filter(Boolean)
-      .map((line) => `<li>${ARRZ.escapeAttr(line)}</li>`)
+      .map((line) => `<li>${KENARRZ.escapeAttr(line)}</li>`)
       .join('');
 
     return settings;
@@ -156,12 +294,17 @@
     document.querySelector('[data-payment-account-code]').textContent = tx.account_code || '-';
     document.querySelector('[data-payment-platform]').textContent = tx.platform || '-';
     document.querySelector('[data-payment-category]').textContent = tx.category_name || '-';
-    document.querySelector('[data-payment-price]').textContent = ARRZ.formatRupiah(tx.price);
-    document.querySelector('[data-payment-total]').textContent = ARRZ.formatRupiah(tx.price);
+    document.querySelector('[data-payment-price]').textContent = KENARRZ.formatRupiah(tx.price);
+    document.querySelector('[data-payment-total]').textContent = KENARRZ.formatRupiah(tx.price);
 
     const badge = document.querySelector('[data-payment-status-badge]');
-    badge.textContent = STATUS_LABEL[tx.payment_status] || tx.payment_status;
+    const emoji = STATUS_EMOJI[tx.payment_status] ? STATUS_EMOJI[tx.payment_status] + ' ' : '';
+    const label = tx.payment_status === 'PAID' && tx.transaction_status === 'COMPLETED' ? '✅ Pesanan Selesai' : `${emoji}${STATUS_LABEL[tx.payment_status] || tx.payment_status}`;
+    badge.textContent = label;
     badge.className = `badge ${STATUS_BADGE_CLASS[tx.payment_status] || 'badge--neutral'}`;
+
+    renderTimeline(tx);
+    renderCredentialsIfCompleted(tx);
 
     const descEl = document.querySelector('[data-payment-status-desc]');
     const qrisBlock = document.querySelector('[data-payment-qris-block]');
@@ -197,17 +340,24 @@
       case 'PAID':
         clearInterval(countdownTimer);
         finalBlock.style.display = '';
-        finalIcon.textContent = '✓';
-        finalTitle.textContent = 'Pembayaran Berhasil Diverifikasi';
-        finalMessage.textContent = 'Pembayaran kamu telah diverifikasi oleh admin. Silakan tunggu proses penyerahan akun.';
-        stopPolling();
+        if (tx.transaction_status === 'COMPLETED') {
+          finalIcon.textContent = '✅';
+          finalTitle.textContent = 'Pesanan Selesai';
+          finalMessage.textContent = 'Pesanan Anda sudah selesai. Data akun tersedia di bagian "AKUN ANDA" di bawah.';
+          stopPolling();
+        } else {
+          finalIcon.textContent = '✓';
+          finalTitle.textContent = 'Pembayaran Anda Telah Diverifikasi';
+          finalMessage.textContent = 'Pembayaran sedang diproses. Data akun akan tampil di halaman ini setelah admin menyelesaikan pesanan — tetap simpan URL transaksi ini.';
+          // Tetap polling — admin bisa menyelesaikan pesanan kapan saja.
+        }
         break;
       case 'COMPLETED':
         clearInterval(countdownTimer);
         finalBlock.style.display = '';
         finalIcon.textContent = '✓';
         finalTitle.textContent = 'Transaksi Selesai';
-        finalMessage.textContent = 'Akun sudah diserahkan. Terima kasih sudah berbelanja di ARRZ MARKET.';
+        finalMessage.textContent = 'Akun sudah diserahkan. Terima kasih sudah berbelanja di KENARRZ MARKET.';
         stopPolling();
         break;
       case 'REJECTED':
@@ -242,7 +392,7 @@
         const tx = await fetchTransaction();
         if (!tx) return;
         currentTx = tx;
-        const settings = ARRZ.getSettings() || {};
+        const settings = KENARRZ.getSettings() || {};
         renderTransaction(tx, settings);
       } catch (e) {
         /* diamkan — coba lagi di polling berikutnya */
@@ -267,7 +417,8 @@
       loadingEl?.remove();
       root.style.display = '';
       renderTransaction(tx, settings);
-      if (['PENDING_PAYMENT', 'PROOF_SUBMITTED', 'VERIFYING'].includes(tx.payment_status)) {
+      if (['PENDING_PAYMENT', 'PROOF_SUBMITTED', 'VERIFYING'].includes(tx.payment_status) ||
+          (tx.payment_status === 'PAID' && tx.transaction_status !== 'COMPLETED')) {
         startPolling();
       }
     } catch (e) {
@@ -303,11 +454,11 @@
     if (!file) return;
     const ext = extFromMime(file.type);
     if (!ext) {
-      ARRZ.toast('Format foto tidak didukung.', 'error');
+      KENARRZ.toast('Format foto tidak didukung.', 'error');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      ARRZ.toast('Ukuran foto maksimal 5 MB.', 'error');
+      KENARRZ.toast('Ukuran foto maksimal 5 MB.', 'error');
       return;
     }
     selectedFile = file;
@@ -343,9 +494,9 @@
     const senderName = paymentForm.querySelector('[name="sender_name"]').value.trim();
     const senderNumber = paymentForm.querySelector('[name="sender_account_number"]').value.trim();
 
-    if (!senderName) return ARRZ.toast('Atas nama pengirim wajib diisi.', 'error');
-    if (!senderNumber) return ARRZ.toast('Nomor DANA/rekening pengirim wajib diisi.', 'error');
-    if (!selectedFile) return ARRZ.toast('Bukti pembayaran wajib diupload.', 'error');
+    if (!senderName) return KENARRZ.toast('Atas nama pengirim wajib diisi.', 'error');
+    if (!senderNumber) return KENARRZ.toast('Nomor DANA/rekening pengirim wajib diisi.', 'error');
+    if (!selectedFile) return KENARRZ.toast('Bukti pembayaran wajib diupload.', 'error');
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Mengirim...';
@@ -397,14 +548,15 @@
         throw new Error(`Gagal mengirim bukti pembayaran: ${msg || 'penyebab tidak diketahui'} (${pgCode || 'no code'})`);
       }
 
-      ARRZ.toast('Bukti pembayaran berhasil dikirim. Pembayaran kamu sedang menunggu verifikasi admin.', 'success');
+      KENARRZ.toast('Bukti pembayaran berhasil dikirim. Pembayaran kamu sedang menunggu verifikasi admin.', 'success');
 
       // Buka WhatsApp admin dengan pesan transaksi (bukan klaim pembayaran berhasil)
       try {
-        const settings = ARRZ.getSettings() || {};
+        const settings = KENARRZ.getSettings() || {};
         const tpl = settings.payment_whatsapp_template || WA_TEMPLATES.DEFAULT_TEMPLATE_PAYMENT;
         const message = WA_TEMPLATES.fillTemplate(tpl, {
           INVOICE: invoiceId,
+          'URL TRANSAKSI': window.location.href,
           'NAMA AKUN': fresh.account_name || '-',
           'ID AKUN': fresh.account_code || '-',
           PLATFORM: fresh.platform || '-',
@@ -416,7 +568,7 @@
           'ATAS NAMA': senderName,
           'NOMOR PEMBAYAR': senderNumber,
         });
-        ARRZ.openWhatsApp(settings.admin_whatsapp, message);
+        KENARRZ.openWhatsApp(settings.admin_whatsapp, message);
       } catch (e) {
         /* jangan blokir alur utama kalau WhatsApp gagal dibuka */
       }
@@ -424,7 +576,7 @@
       selectedFile = null;
       loadAndRender();
     } catch (err) {
-      ARRZ.toast(err.message, 'error', 9000);
+      KENARRZ.toast(err.message, 'error', 9000);
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Kirim Bukti Pembayaran';
@@ -437,4 +589,5 @@
   });
 
   loadAndRender();
+  setupUrlTracking();
 })();
