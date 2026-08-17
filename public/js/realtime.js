@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — realtime.js
+   KENARRZ MARKET — realtime.js
    Dulu Socket.IO publik. Sekarang Supabase Realtime (postgres_changes)
    mendengarkan tabel accounts agar homepage/shop/product ikut update
    tanpa reload, persis seperti event account:statusChanged/deleted lama.
@@ -33,9 +33,9 @@
     const soldSection = document.querySelector('[data-sold-section]');
     if (!soldGrid || !account) return;
     if (soldGrid.querySelector(`[data-account-id="${account.id}"]`)) return;
-    if (typeof ARRZ === 'undefined' || !ARRZ.renderAccountCard) return;
+    if (typeof KENARRZ === 'undefined' || !KENARRZ.renderAccountCard) return;
 
-    soldGrid.insertAdjacentHTML('afterbegin', ARRZ.renderAccountCard(account));
+    soldGrid.insertAdjacentHTML('afterbegin', KENARRZ.renderAccountCard(account));
     if (soldSection) soldSection.style.display = '';
     const countBadge = document.querySelector('[data-sold-count]');
     if (countBadge) countBadge.textContent = String((Number(countBadge.textContent) || 0) + 1);
@@ -67,11 +67,11 @@
         .maybeSingle();
       addToSoldSection(fullAccount);
 
-      if (cardOnPage && !(window.ARRZ_PRODUCT_ID && window.ARRZ_PRODUCT_ID === row.id)) {
-        ARRZ.toast('Sebuah akun baru saja terjual.', 'info');
+      if (cardOnPage && !(window.KENARRZ_PRODUCT_ID && window.KENARRZ_PRODUCT_ID === row.id)) {
+        KENARRZ.toast('Sebuah akun baru saja terjual.', 'info');
       }
-      if (window.ARRZ_PRODUCT_ID && window.ARRZ_PRODUCT_ID === row.id) {
-        ARRZ.toast('Akun ini baru saja terjual.', 'info');
+      if (window.KENARRZ_PRODUCT_ID && window.KENARRZ_PRODUCT_ID === row.id) {
+        KENARRZ.toast('Akun ini baru saja terjual.', 'info');
         const badge = document.querySelector('[data-product-status-badge]');
         if (badge) {
           badge.textContent = 'Sold';
@@ -95,7 +95,7 @@
         cardOnPage.classList.add('is-sold');
         cardOnPage.querySelectorAll('[data-card-buy], [data-card-offer]').forEach((btn) => (btn.disabled = true));
       }
-      if (window.ARRZ_PRODUCT_ID && window.ARRZ_PRODUCT_ID === row.id) {
+      if (window.KENARRZ_PRODUCT_ID && window.KENARRZ_PRODUCT_ID === row.id) {
         const badge = document.querySelector('[data-product-status-badge]');
         if (badge) {
           badge.textContent = 'Diproses';
@@ -111,7 +111,7 @@
 
   // Satu channel per tab, nama unik agar tidak bentrok dengan channel admin.
   const channel = supabaseClient
-    .channel('arrz-market-public')
+    .channel('kenarrz-market-public')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, handleAccountChange)
     .subscribe();
 
