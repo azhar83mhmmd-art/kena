@@ -1,11 +1,11 @@
 /* ============================================================
-   ARRZ MARKET — app.js
+   KENARRZ MARKET — app.js
    Shared utilities: navbar, toast, WhatsApp helper, settings,
    dan logika khusus homepage (featured accounts, kategori, hero).
    Migrasi: tidak lagi fetch ke /api/*, langsung ke Supabase client.
    ============================================================ */
 
-const ARRZ = (function () {
+const KENARRZ = (function () {
   const state = {
     settings: null,
   };
@@ -47,6 +47,47 @@ const ARRZ = (function () {
     return 'Rp' + n.toLocaleString('id-ID');
   }
 
+  // ── Diskon: hitung harga yang berlaku sekarang (mirror dari
+  // effective_price() di database) — dipakai HANYA untuk tampilan.
+  // Harga transaksi sesungguhnya selalu dihitung ulang di server lewat
+  // RPC create_purchase_transaction, jadi nilai ini tidak pernah dikirim
+  // sebagai harga saat checkout.
+  function isDiscountLive(account) {
+    if (!account || !account.discount_active || account.discount_price == null) return false;
+    const now = new Date();
+    if (account.discount_starts_at && new Date(account.discount_starts_at) > now) return false;
+    if (account.discount_ends_at && new Date(account.discount_ends_at) < now) return false;
+    return Number(account.discount_price) < Number(account.price);
+  }
+
+  function getEffectivePrice(account) {
+    return isDiscountLive(account) ? Number(account.discount_price) : Number(account.price);
+  }
+
+  function discountPercent(account) {
+    if (!isDiscountLive(account)) return 0;
+    const price = Number(account.price) || 0;
+    const discountPrice = Number(account.discount_price) || 0;
+    if (price <= 0) return 0;
+    return Math.round(((price - discountPrice) / price) * 100);
+  }
+
+  // Markup harga siap pakai: harga coret + harga diskon + label promo,
+  // atau harga normal saja kalau diskon tidak aktif.
+  function priceMarkup(account) {
+    if (!isDiscountLive(account)) {
+      return `<span class="price-block__final">${formatRupiah(account.price)}</span>`;
+    }
+    const pct = discountPercent(account);
+    const label = account.promo_label ? escapeAttr(account.promo_label) : `HEMAT ${pct}%`;
+    return `
+      <span class="price-block price-block--discount">
+        <span class="price-block__promo-label">${label}</span>
+        <del class="price-block__original">${formatRupiah(account.price)}</del>
+        <span class="price-block__final">${formatRupiah(account.discount_price)}</span>
+      </span>`;
+  }
+
   // ── WhatsApp helper terpusat ──────────────────────────────
   // Dulu pesan dibuat backend; sekarang dibuat di browser lewat
   // WA_TEMPLATES (wa-templates.js) memakai template dari site_settings.
@@ -81,10 +122,10 @@ const ARRZ = (function () {
   function applySettingsToDom() {
     const s = state.settings || {};
     document.querySelectorAll('[data-site-name]').forEach((el) => {
-      el.textContent = s.site_name || 'ARRZ MARKET';
+      el.textContent = s.site_name || 'KENARRZ MARKET';
     });
     document.querySelectorAll('[data-footer-text]').forEach((el) => {
-      el.textContent = s.footer_text || `© ${new Date().getFullYear()} ARRZ MARKET. Seluruh hak cipta dilindungi.`;
+      el.textContent = s.footer_text || `© ${new Date().getFullYear()} KENARRZ MARKET. Seluruh hak cipta dilindungi.`;
     });
   }
 
@@ -145,8 +186,8 @@ const ARRZ = (function () {
     const productUrl = `product.html?id=${encodeURIComponent(account.id)}`;
 
     const mediaHtml = primary
-      ? `<img src="${escapeAttr(primary.image_url)}" alt="${escapeAttr(account.name)}" loading="lazy" onerror="this.closest('.account-card__media').innerHTML='<div class=&quot;account-card__media-fallback&quot;>ARRZ MARKET</div>'" />`
-      : `<div class="account-card__media-fallback">ARRZ MARKET</div>`;
+      ? `<img src="${escapeAttr(primary.image_url)}" alt="${escapeAttr(account.name)}" loading="lazy" onerror="this.closest('.account-card__media').innerHTML='<div class=&quot;account-card__media-fallback&quot;>KENARRZ MARKET</div>'" />`
+      : `<div class="account-card__media-fallback">KENARRZ MARKET</div>`;
 
     return `
       <div class="account-card ${isUnavailable ? 'is-sold' : ''}" data-account-id="${escapeAttr(account.id)}">
@@ -157,6 +198,7 @@ const ARRZ = (function () {
               <span class="badge ${statusClass}" data-card-status-badge>${statusLabel}</span>
             </div>
             ${account.featured ? '<div class="account-card__stamp">Featured</div>' : ''}
+            ${isDiscountLive(account) ? `<div class="account-card__promo-stamp">${account.promo_label ? escapeAttr(account.promo_label) : `HEMAT ${discountPercent(account)}%`}</div>` : ''}
           </div>
           <div class="account-card__perforation"></div>
           <div class="account-card__body">
@@ -165,7 +207,7 @@ const ARRZ = (function () {
             <h3 class="account-card__name">${escapeAttr(account.name)}</h3>
             <p class="account-card__platform">${escapeAttr(account.platform)}</p>
             <p class="account-card__desc">${escapeAttr(account.description || '')}</p>
-            <div class="account-card__price">${formatRupiah(account.price)}</div>
+            <div class="account-card__price">${priceMarkup(account)}</div>
           </div>
         </a>
         <div class="account-card__actions">
@@ -288,6 +330,17 @@ const ARRZ = (function () {
     document.querySelectorAll('[data-current-year]').forEach((el) => {
       el.textContent = new Date().getFullYear();
     });
+
+    // Toggle show/hide untuk field password (sell.html, admin.html, dst).
+    document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.togglePassword);
+        if (!input) return;
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.textContent = isHidden ? 'Hide' : 'Show';
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', init);
@@ -302,5 +355,9 @@ const ARRZ = (function () {
     skeletonCards,
     escapeAttr,
     isValidWhatsApp,
+    isDiscountLive,
+    getEffectivePrice,
+    discountPercent,
+    priceMarkup,
   };
 })();
