@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — wa-templates.js
+   KENARRZ MARKET — wa-templates.js
    Dulu di lib/waTemplate.js (server). Sekarang berjalan di browser
    karena tidak ada lagi backend Express. Dipakai oleh product.js
    dan sell.js untuk membangun pesan WhatsApp dari template di
@@ -22,7 +22,7 @@ const WA_TEMPLATES = (function () {
     return result;
   }
 
-  const DEFAULT_TEMPLATE_BUY = `Halo Admin ARRZ MARKET.
+  const DEFAULT_TEMPLATE_BUY = `Halo Admin KENARRZ MARKET.
 
 Saya ingin membeli akun berikut:
 
@@ -45,7 +45,7 @@ Mohon informasi mengenai proses pembayaran dan penyerahan akun.
 
 Terima kasih.`;
 
-  const DEFAULT_TEMPLATE_OFFER = `Halo Admin ARRZ MARKET.
+  const DEFAULT_TEMPLATE_OFFER = `Halo Admin KENARRZ MARKET.
 
 Saya ingin mengajukan tawaran untuk akun berikut:
 
@@ -73,7 +73,7 @@ Saya ingin melakukan negosiasi untuk akun tersebut.
 
 Terima kasih.`;
 
-  const DEFAULT_TEMPLATE_SELL = `Halo Admin ARRZ MARKET.
+  const DEFAULT_TEMPLATE_SELL = `Halo Admin KENARRZ MARKET.
 
 Saya ingin mengajukan akun untuk dijual.
 
@@ -97,13 +97,13 @@ Deskripsi:
 Detail:
 [DETAIL]
 
-Saya ingin menjual akun tersebut melalui ARRZ MARKET.
+Saya ingin menjual akun tersebut melalui KENARRZ MARKET.
 
 Mohon dilakukan pengecekan.
 
 Terima kasih.`;
 
-  const DEFAULT_TEMPLATE_PAYMENT = `Halo Admin ARRZ MARKET.
+  const DEFAULT_TEMPLATE_PAYMENT = `Halo Admin KENARRZ MARKET.
 
 Saya telah melakukan pembayaran untuk transaksi berikut:
 
@@ -111,6 +111,7 @@ Saya telah melakukan pembayaran untuk transaksi berikut:
 DETAIL PESANAN
 ━━━━━━━━━━━━━━━━
 Invoice: [INVOICE]
+URL Transaksi: [URL TRANSAKSI]
 Nama Akun: [NAMA AKUN]
 ID Akun: [ID AKUN]
 Platform: [PLATFORM]
@@ -136,9 +137,9 @@ Bukti pembayaran sudah saya upload melalui website.
 Mohon Admin melakukan verifikasi pembayaran dan memproses pesanan saya.
 
 Terima kasih.
-ARRZ MARKET`;
+KENARRZ MARKET`;
 
-  const DEFAULT_PAYMENT_INSTRUCTION = `1. Scan QRIS DANA Bisnis ARRZ MARKET.
+  const DEFAULT_PAYMENT_INSTRUCTION = `1. Scan QRIS DANA Bisnis KENARRZ MARKET.
 2. Bayar sesuai total transaksi.
 3. Pastikan pembayaran berhasil.
 4. Simpan screenshot/bukti pembayaran.
