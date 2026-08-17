@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jual Akun — ARRZ MARKET</title>
-  <meta name="description" content="Ajukan akun digitalmu untuk dijual di ARRZ MARKET." />
+  <title>Jual Akun — KENARRZ MARKET</title>
+  <meta name="description" content="Ajukan akun digitalmu untuk dijual di KENARRZ MARKET." />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/marketplace.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
 </head>
 <body>
 
   <header class="navbar">
     <div class="navbar__inner">
       <a href="index.html" class="navbar__logo">
-        <span class="navbar__logo-mark">A</span>
-        <span data-site-name>ARRZ MARKET</span>
+        <img src="img/logo-mark.png" alt="KENARRZ MARKET" class="navbar__logo-mark" />
+        <span data-site-name>KENARRZ MARKET</span>
       </a>
       <nav class="navbar__links">
         <a href="index.html" class="navbar__link">Beranda</a>
@@ -135,6 +138,24 @@
           <div class="photo-preview-grid" data-photo-preview></div>
         </div>
 
+        <h3 style="margin:26px 0 14px;">Data Login Akun (Untuk Verifikasi Admin)</h3>
+        <div class="payment-warning" style="margin-bottom:16px;">
+          Pastikan data akun yang diberikan benar. Data ini hanya digunakan admin untuk proses pemeriksaan dan <strong>tidak akan pernah ditampilkan secara publik</strong> di halaman manapun.
+        </div>
+        <div class="form-grid-2">
+          <div class="field">
+            <label for="account-email">Email Akun</label>
+            <input type="email" id="account-email" name="account_email" autocomplete="off" placeholder="akun@example.com" />
+          </div>
+          <div class="field">
+            <label for="account-password">Password Akun</label>
+            <div style="display:flex; gap:8px;">
+              <input type="password" id="account-password" name="account_password" autocomplete="new-password" style="flex:1;" />
+              <button type="button" class="btn btn-sm" data-toggle-password="account-password">Show</button>
+            </div>
+          </div>
+        </div>
+
         <div class="field" style="margin-top:24px;">
           <label class="checkbox-row">
             <input type="checkbox" name="confirmed" required />
@@ -150,7 +171,7 @@
   <footer class="footer">
     <div class="container">
       <div class="footer__bottom">
-        <span data-footer-text>© <span data-current-year></span> ARRZ MARKET. Seluruh hak cipta dilindungi.</span>
+        <span data-footer-text>© <span data-current-year></span> KENARRZ MARKET. Seluruh hak cipta dilindungi.</span>
       </div>
     </div>
   </footer>
