@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — supabase-client.js
+   KENARRZ MARKET — supabase-client.js
    Konfigurasi terpusat Supabase client (browser).
    JANGAN PERNAH memasukkan SUPABASE_SERVICE_ROLE_KEY di sini.
    ============================================================ */
