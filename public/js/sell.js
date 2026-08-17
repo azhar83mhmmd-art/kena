@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — sell.js
+   KENARRZ MARKET — sell.js
    Form pengajuan Jual Akun: upload multi foto (drag & drop),
    validasi, insert langsung ke Supabase, buka WhatsApp dengan
    pesan siap pakai. Migrasi: upload langsung ke Supabase Storage
@@ -27,7 +27,7 @@
       if (error) throw error;
       categorySelect.innerHTML =
         '<option value="">Pilih kategori</option>' +
-        (data || []).map((cat) => `<option value="${cat.id}">${ARRZ.escapeAttr(cat.name)}</option>`).join('');
+        (data || []).map((cat) => `<option value="${cat.id}">${KENARRZ.escapeAttr(cat.name)}</option>`).join('');
     } catch (e) {
       categorySelect.innerHTML = '<option value="">Gagal memuat kategori</option>';
     }
@@ -53,15 +53,15 @@
   function handleFiles(fileList) {
     for (const file of Array.from(fileList)) {
       if (selectedFiles.length >= MAX_FILES) {
-        ARRZ.toast(`Maksimal ${MAX_FILES} foto.`, 'error');
+        KENARRZ.toast(`Maksimal ${MAX_FILES} foto.`, 'error');
         break;
       }
       if (!ALLOWED_TYPES.includes(file.type)) {
-        ARRZ.toast(`${file.name}: format tidak didukung (gunakan JPG/PNG/WEBP).`, 'error');
+        KENARRZ.toast(`${file.name}: format tidak didukung (gunakan JPG/PNG/WEBP).`, 'error');
         continue;
       }
       if (file.size > MAX_SIZE) {
-        ARRZ.toast(`${file.name}: ukuran melebihi 5MB.`, 'error');
+        KENARRZ.toast(`${file.name}: ukuran melebihi 5MB.`, 'error');
         continue;
       }
       selectedFiles.push(file);
@@ -108,7 +108,7 @@
         .from('account-images')
         .upload(path, file, { contentType: file.type, upsert: false });
       if (uploadErr) {
-        ARRZ.toast(`${file.name}: gagal diunggah (${uploadErr.message}).`, 'error');
+        KENARRZ.toast(`${file.name}: gagal diunggah (${uploadErr.message}).`, 'error');
         continue;
       }
       const { data: publicUrlData } = supabaseClient.storage.from('account-images').getPublicUrl(path);
@@ -129,11 +129,11 @@
     const platform = form.querySelector('[name="platform"]').value.trim();
     const desiredPrice = form.querySelector('[name="desired_price"]').value;
 
-    if (!sellerName) return ARRZ.toast('Nama wajib diisi.', 'error');
-    if (!ARRZ.isValidWhatsApp(sellerWa)) return ARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
-    if (!accountName || !platform) return ARRZ.toast('Nama akun dan platform wajib diisi.', 'error');
+    if (!sellerName) return KENARRZ.toast('Nama wajib diisi.', 'error');
+    if (!KENARRZ.isValidWhatsApp(sellerWa)) return KENARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
+    if (!accountName || !platform) return KENARRZ.toast('Nama akun dan platform wajib diisi.', 'error');
     if (!confirmCheckbox.checked) {
-      ARRZ.toast('Kamu harus menyetujui bahwa informasi yang diberikan benar.', 'error');
+      KENARRZ.toast('Kamu harus menyetujui bahwa informasi yang diberikan benar.', 'error');
       return;
     }
 
@@ -160,6 +160,8 @@
         details: form.querySelector('[name="details"]').value.trim(),
         features: form.querySelector('[name="features"]').value.trim(),
         additional_info: form.querySelector('[name="additional_info"]').value.trim(),
+        account_email: form.querySelector('[name="account_email"]').value.trim() || null,
+        account_password: form.querySelector('[name="account_password"]').value || null,
         photo_urls: photoUrls,
         status: 'PENDING',
       };
@@ -176,7 +178,7 @@
         categoryName = cat?.name || '-';
       }
 
-      const settings = (await ARRZ.loadSettings()) || {};
+      const settings = (await KENARRZ.loadSettings()) || {};
       const template = settings.wa_template_sell || WA_TEMPLATES.DEFAULT_TEMPLATE_SELL;
       const message = WA_TEMPLATES.fillTemplate(template, {
         NAMA: sellerName,
@@ -191,14 +193,14 @@
         DETAIL: payload.details || '-',
       });
 
-      ARRZ.openWhatsApp(settings.admin_whatsapp || '', message);
-      ARRZ.toast('Pengajuan terkirim! Kamu akan diarahkan ke WhatsApp admin.', 'success');
+      KENARRZ.openWhatsApp(settings.admin_whatsapp || '', message);
+      KENARRZ.toast('Pengajuan terkirim! Kamu akan diarahkan ke WhatsApp admin.', 'success');
       form.reset();
       selectedFiles = [];
       renderPreviews();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      ARRZ.toast(err.message, 'error');
+      KENARRZ.toast(err.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Kirim Pengajuan';
