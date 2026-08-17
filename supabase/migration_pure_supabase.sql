@@ -1,5 +1,5 @@
 -- ============================================================
--- ARRZ MARKET — Migrasi ke Pure Supabase (REVISI 2)
+-- KENARRZ MARKET — Migrasi ke Pure Supabase (REVISI 2)
 -- Jalankan SETELAH schema.sql lama sudah ada di database.
 -- Jalankan di Supabase SQL Editor, urut dari atas ke bawah.
 -- Aman dijalankan ulang (idempotent) berkat "if exists"/"or replace".
