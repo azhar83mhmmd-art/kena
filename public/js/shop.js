@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — shop.js
+   KENARRZ MARKET — shop.js
    Halaman Beli Akun: filter kategori/harga/status, search, sort,
    pagination, dan render grid akun. Migrasi: query langsung ke
    Supabase, bukan lagi fetch /api/accounts.
@@ -68,7 +68,7 @@
     platformBanner.innerHTML = `
       <button type="button" class="platform-chip ${!state.platform ? 'is-active' : ''}" data-platform-value="">Semua Platform</button>
       ${PLATFORMS.map(
-        (p) => `<button type="button" class="platform-chip ${state.platform === p.key ? 'is-active' : ''}" data-platform-value="${ARRZ.escapeAttr(p.key)}">${ARRZ.escapeAttr(p.label)}</button>`
+        (p) => `<button type="button" class="platform-chip ${state.platform === p.key ? 'is-active' : ''}" data-platform-value="${KENARRZ.escapeAttr(p.key)}">${KENARRZ.escapeAttr(p.label)}</button>`
       ).join('')}`;
 
     platformBanner.querySelectorAll('[data-platform-value]').forEach((btn) => {
@@ -100,8 +100,8 @@
       ${PLATFORMS.map(
         (p) => `
       <label>
-        <input type="radio" name="platform" value="${ARRZ.escapeAttr(p.key)}" ${state.platform === p.key ? 'checked' : ''} />
-        ${ARRZ.escapeAttr(p.label)}
+        <input type="radio" name="platform" value="${KENARRZ.escapeAttr(p.key)}" ${state.platform === p.key ? 'checked' : ''} />
+        ${KENARRZ.escapeAttr(p.label)}
       </label>`
       ).join('')}`;
 
@@ -132,7 +132,7 @@
             (cat) => `
           <label>
             <input type="radio" name="category" value="${cat.id}" ${state.category === cat.id ? 'checked' : ''} />
-            ${ARRZ.escapeAttr(cat.name)}
+            ${KENARRZ.escapeAttr(cat.name)}
           </label>`
           )
           .join('')}`;
@@ -194,7 +194,7 @@
   async function fetchAccounts(append = false) {
     grid.setAttribute('aria-busy', 'true');
     if (!append) {
-      grid.innerHTML = ARRZ.skeletonCards(6);
+      grid.innerHTML = KENARRZ.skeletonCards(6);
     }
     try {
       const from = (state.page - 1) * state.limit;
@@ -239,13 +239,13 @@
         </div>`;
       return;
     }
-    grid.innerHTML = accounts.map(ARRZ.renderAccountCard).join('');
+    grid.innerHTML = accounts.map(KENARRZ.renderAccountCard).join('');
   }
 
   // ── Bagian "Akun Terjual" (SOLD) — terpisah dari listing utama ──────
   async function fetchSoldAccounts() {
     if (!soldGrid) return;
-    soldGrid.innerHTML = ARRZ.skeletonCards(3);
+    soldGrid.innerHTML = KENARRZ.skeletonCards(3);
     try {
       const { data, error, count } = await supabaseClient
         .from('accounts')
@@ -259,7 +259,7 @@
         return;
       }
       soldSection.style.display = '';
-      soldGrid.innerHTML = data.map(ARRZ.renderAccountCard).join('');
+      soldGrid.innerHTML = data.map(KENARRZ.renderAccountCard).join('');
       const countBadge = document.querySelector('[data-sold-count]');
       if (countBadge) countBadge.textContent = count || data.length;
     } catch (e) {
