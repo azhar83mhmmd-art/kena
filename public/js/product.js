@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — product.js
+   KENARRZ MARKET — product.js
    Halaman detail akun: galeri foto, modal Beli Sekarang & Tawar
    Harga. Migrasi: insert langsung ke Supabase (transactions/offers),
    pesan WhatsApp dibangun di browser lewat WA_TEMPLATES.
@@ -47,7 +47,7 @@
     }
     const { data, error } = await supabaseClient
       .from('accounts')
-      .select('id, status, price, name')
+      .select('id, status, price, name, discount_active, discount_price, discount_starts_at, discount_ends_at, promo_label')
       .eq('id', accountId)
       .maybeSingle();
     if (error) throw error;
@@ -60,7 +60,7 @@
       const data = await fetchAccount();
       if (!data) throw new Error('Akun tidak ditemukan.');
       currentAccount = data;
-      window.ARRZ_PRODUCT_ID = data.id;
+      window.KENARRZ_PRODUCT_ID = data.id;
       renderProduct(data);
       loadingEl?.remove();
       root.style.display = '';
@@ -74,7 +74,7 @@
           const targetBtn = document.querySelector(pendingAction === 'buy' ? '[data-buy-btn]' : '[data-offer-btn]');
           targetBtn?.click();
         } else {
-          ARRZ.toast('Akun ini baru saja terjual. Silakan pilih akun lainnya.', 'error');
+          KENARRZ.toast('Akun ini baru saja terjual. Silakan pilih akun lainnya.', 'error');
         }
       }
     } catch (e) {
@@ -85,7 +85,7 @@
   }
 
   function renderProduct(account) {
-    document.title = `${account.name} — ARRZ MARKET`;
+    document.title = `${account.name} — KENARRZ MARKET`;
 
     const images = account.account_images || [];
     const sorted = [...images].sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
@@ -93,25 +93,25 @@
     const thumbsWrap = document.querySelector('[data-gallery-thumbs]');
 
     if (sorted.length > 0) {
-      mainImg.innerHTML = `<img src="${ARRZ.escapeAttr(sorted[0].image_url)}" alt="${ARRZ.escapeAttr(account.name)}" />`;
+      mainImg.innerHTML = `<img src="${KENARRZ.escapeAttr(sorted[0].image_url)}" alt="${KENARRZ.escapeAttr(account.name)}" />`;
       thumbsWrap.innerHTML = sorted
         .map(
           (img, idx) => `
-        <div class="product-gallery__thumb ${idx === 0 ? 'is-active' : ''}" data-thumb data-src="${ARRZ.escapeAttr(img.image_url)}">
-          <img src="${ARRZ.escapeAttr(img.image_url)}" alt="" />
+        <div class="product-gallery__thumb ${idx === 0 ? 'is-active' : ''}" data-thumb data-src="${KENARRZ.escapeAttr(img.image_url)}">
+          <img src="${KENARRZ.escapeAttr(img.image_url)}" alt="" />
         </div>`
         )
         .join('');
 
       thumbsWrap.querySelectorAll('[data-thumb]').forEach((thumb) => {
         thumb.addEventListener('click', () => {
-          mainImg.innerHTML = `<img src="${thumb.dataset.src}" alt="${ARRZ.escapeAttr(account.name)}" />`;
+          mainImg.innerHTML = `<img src="${thumb.dataset.src}" alt="${KENARRZ.escapeAttr(account.name)}" />`;
           thumbsWrap.querySelectorAll('[data-thumb]').forEach((t) => t.classList.remove('is-active'));
           thumb.classList.add('is-active');
         });
       });
     } else {
-      mainImg.innerHTML = `<div class="account-card__media-fallback" style="height:100%;">ARRZ MARKET</div>`;
+      mainImg.innerHTML = `<div class="account-card__media-fallback" style="height:100%;">KENARRZ MARKET</div>`;
       thumbsWrap.innerHTML = '';
     }
 
@@ -121,7 +121,7 @@
     document.querySelector('[data-product-code]').textContent = account.account_code || '';
     document.querySelector('[data-product-name]').textContent = account.name;
     document.querySelector('[data-product-platform]').textContent = account.platform;
-    document.querySelector('[data-product-price]').textContent = ARRZ.formatRupiah(account.price);
+    document.querySelector('[data-product-price]').innerHTML = KENARRZ.priceMarkup(account);
     document.querySelector('[data-product-description]').textContent = account.description || '-';
 
     const detailsEl = document.querySelector('[data-product-details]');
@@ -160,12 +160,12 @@
     }
 
     document.querySelectorAll('[data-modal-account-name]').forEach((el) => (el.textContent = account.name));
-    document.querySelectorAll('[data-modal-account-price]').forEach((el) => (el.textContent = ARRZ.formatRupiah(account.price)));
+    document.querySelectorAll('[data-modal-account-price]').forEach((el) => (el.textContent = KENARRZ.formatRupiah(KENARRZ.getEffectivePrice(account))));
   }
 
   // ── Ambil template pesan & nomor admin dari site_settings ────
   async function getWhatsappContext() {
-    const settings = (await ARRZ.loadSettings()) || {};
+    const settings = (await KENARRZ.loadSettings()) || {};
     return {
       adminNumber: settings.admin_whatsapp || '',
       templates: {
@@ -194,12 +194,12 @@
     try {
       const { available, data: acc } = await checkStatus();
       if (!available) {
-        ARRZ.toast(unavailableMessage(acc?.status), 'error');
+        KENARRZ.toast(unavailableMessage(acc?.status), 'error');
         return;
       }
       openModal(buyModal);
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   });
 
@@ -211,8 +211,8 @@
     const ig = buyForm.querySelector('[name="buyer_instagram"]').value.trim();
 
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!email || !emailValid) return ARRZ.toast('Email wajib diisi dengan format yang valid.', 'error');
-    if (!ARRZ.isValidWhatsApp(wa)) return ARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
+    if (!email || !emailValid) return KENARRZ.toast('Email wajib diisi dengan format yang valid.', 'error');
+    if (!KENARRZ.isValidWhatsApp(wa)) return KENARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Menyiapkan pembayaran...';
@@ -262,7 +262,7 @@
       buyForm.reset();
       window.location.href = `payment.html?invoice=${encodeURIComponent(row.invoice_id)}`;
     } catch (err) {
-      ARRZ.toast(err.message, 'error');
+      KENARRZ.toast(err.message, 'error');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Lanjutkan Pembayaran';
     }
@@ -276,12 +276,12 @@
     try {
       const { available, data: acc } = await checkStatus();
       if (!available) {
-        ARRZ.toast(unavailableMessage(acc?.status), 'error');
+        KENARRZ.toast(unavailableMessage(acc?.status), 'error');
         return;
       }
       openModal(offerModal);
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   });
 
@@ -293,9 +293,9 @@
     const wa = offerForm.querySelector('[name="buyer_whatsapp"]').value.trim();
     const note = offerForm.querySelector('[name="note"]').value.trim();
 
-    if (!offerPrice || offerPrice <= 0) return ARRZ.toast('Harga tawaran harus berupa angka dan tidak boleh kosong.', 'error');
-    if (!name) return ARRZ.toast('Nama wajib diisi.', 'error');
-    if (!ARRZ.isValidWhatsApp(wa)) return ARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
+    if (!offerPrice || offerPrice <= 0) return KENARRZ.toast('Harga tawaran harus berupa angka dan tidak boleh kosong.', 'error');
+    if (!name) return KENARRZ.toast('Nama wajib diisi.', 'error');
+    if (!KENARRZ.isValidWhatsApp(wa)) return KENARRZ.toast('Nomor WhatsApp wajib diisi dengan format yang benar.', 'error');
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Memproses...';
@@ -330,12 +330,12 @@
         CATATAN: note || '-',
       });
 
-      ARRZ.openWhatsApp(adminNumber, message);
+      KENARRZ.openWhatsApp(adminNumber, message);
       closeModal(offerModal);
-      ARRZ.toast('Tawaran terkirim! Kamu akan diarahkan ke WhatsApp admin.', 'success');
+      KENARRZ.toast('Tawaran terkirim! Kamu akan diarahkan ke WhatsApp admin.', 'success');
       offerForm.reset();
     } catch (err) {
-      ARRZ.toast(err.message, 'error');
+      KENARRZ.toast(err.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Ajukan Tawaran';
