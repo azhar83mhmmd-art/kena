@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — admin.css
+   KENARRZ MARKET — admin.css
    Layout dashboard admin: login, sidebar, tabel, cards, form
    ============================================================ */
 
@@ -37,6 +37,24 @@
   font-size: 1.2rem;
 }
 
+.admin-login__logo .navbar__logo-mark { width: 36px; height: 36px; }
+
+.admin-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-sidebar__logo-mark {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: #e9e6df;
+  border-radius: 6px;
+  padding: 2px;
+}
+
 .admin-login__error {
   background: var(--danger-soft);
   color: var(--danger);
@@ -60,7 +78,7 @@
 
 .admin-sidebar {
   background: var(--ink);
-  color: #efede3;
+  color: #e9e6df;
   padding: 22px 14px;
   display: flex;
   flex-direction: column;
@@ -85,7 +103,7 @@
   gap: 10px;
   padding: 11px 12px;
   border-radius: var(--radius);
-  color: #c8c6c0;
+  color: #b6b2a8;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -197,7 +215,7 @@
 
 .admin-table td {
   padding: 12px;
-  border-bottom: 1px solid #e2e0d3;
+  border-bottom: 1px solid #ddd9cf;
   vertical-align: middle;
 }
 
@@ -388,3 +406,22 @@
 }
 .tx-proof-img-overlay.is-open { display: flex; }
 .tx-proof-img-overlay img { max-width: 100%; max-height: 90vh; border-radius: var(--radius); }
+
+/* ── Fieldset (diskon, kredensial akun) ── */
+.admin-fieldset {
+  border: var(--border-w-sm) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+
+.admin-fieldset legend {
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0 6px;
+}
+
+.badge--success {
+  background: var(--success-soft);
+  color: var(--success);
+}
