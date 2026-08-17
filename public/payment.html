@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pembayaran — ARRZ MARKET</title>
+  <title>Pembayaran — KENARRZ MARKET</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/marketplace.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
 </head>
 <body>
 
   <header class="navbar">
     <div class="navbar__inner">
       <a href="index.html" class="navbar__logo">
-        <span class="navbar__logo-mark">A</span>
-        <span data-site-name>ARRZ MARKET</span>
+        <img src="img/logo-mark.png" alt="KENARRZ MARKET" class="navbar__logo-mark" />
+        <span data-site-name>KENARRZ MARKET</span>
       </a>
       <nav class="navbar__links">
         <a href="index.html" class="navbar__link">Beranda</a>
@@ -72,6 +75,25 @@
             <span>Batas waktu pembayaran</span>
             <strong data-payment-countdown>—</strong>
           </div>
+        </div>
+
+        <!-- ═══ URL Tracking — WAJIB disimpan pembeli ═══ -->
+        <div class="payment-block payment-block--url-tracking">
+          <h3 style="margin-top:0;">🔒 SIMPAN URL TRANSAKSI ANDA</h3>
+          <p style="margin:0 0 10px; font-size:0.88rem;">Gunakan URL ini untuk melihat status verifikasi pembayaran dan menerima data akun setelah admin menyelesaikan proses. <strong>Jangan bagikan URL ini kepada orang lain.</strong></p>
+          <div class="payment-url-box">
+            <input type="text" readonly data-payment-url-input class="mono" />
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <button type="button" class="btn btn-primary btn-sm" data-copy-url-btn>Salin URL</button>
+            <button type="button" class="btn btn-sm" data-share-url-btn style="display:none;">Bagikan URL</button>
+          </div>
+        </div>
+
+        <!-- ═══ Timeline status ═══ -->
+        <div class="payment-block">
+          <h3 style="margin-top:0;">Status Pesanan</h3>
+          <ol class="tx-timeline" data-payment-timeline></ol>
         </div>
 
         <div class="payment-block">
@@ -144,6 +166,28 @@
           </div>
         </div>
 
+        <!-- ═══ AKUN ANDA — hanya muncul setelah pesanan COMPLETED ═══ -->
+        <div class="payment-block" data-payment-credentials-block style="display:none;">
+          <h3 style="margin-top:0;">AKUN ANDA</h3>
+          <p style="font-size:0.85rem; margin-top:0;">Simpan data ini di tempat aman. Segera ganti password akun setelah menerimanya.</p>
+          <div class="field">
+            <label>Email</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" readonly data-cred-email class="mono" style="flex:1;" />
+              <button type="button" class="btn btn-sm" data-copy-email-btn>Salin Email</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div style="display:flex; gap:8px;">
+              <input type="password" readonly data-cred-password class="mono" style="flex:1;" />
+              <button type="button" class="btn btn-sm" data-toggle-cred-password-btn>Tampilkan Password</button>
+              <button type="button" class="btn btn-sm" data-copy-password-btn>Salin Password</button>
+            </div>
+          </div>
+          <div data-payment-credentials-loading style="font-size:0.85rem;">Memuat data akun...</div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -151,7 +195,7 @@
   <footer class="footer">
     <div class="container">
       <div class="footer__bottom">
-        <span data-footer-text>© <span data-current-year></span> ARRZ MARKET. Seluruh hak cipta dilindungi.</span>
+        <span data-footer-text>© <span data-current-year></span> KENARRZ MARKET. Seluruh hak cipta dilindungi.</span>
       </div>
     </div>
   </footer>
