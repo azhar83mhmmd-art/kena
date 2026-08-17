@@ -1,31 +1,31 @@
 /* ============================================================
-   ARRZ MARKET — style.css
+   KENARRZ MARKET — style.css
    Professional Neo-Brutalism design system
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-  /* ── Color tokens ── */
-  --ink: #14151a;
-  --ink-soft: #45464f;
-  --bg: #efede3;
-  --bg-raised: #f7f6ef;
+  /* ── Color tokens — Monokrom (warm graphite / stone), natural & tegas ── */
+  --ink: #1b1a18;
+  --ink-soft: #58544c;
+  --bg: #e9e6df;
+  --bg-raised: #f6f4f0;
   --card: #ffffff;
   --border: var(--ink);
 
-  --accent: #2f5dff;
-  --accent-ink: #0a1a66;
-  --accent-soft: #e3e9ff;
+  --accent: #2b2823;
+  --accent-ink: #0c0b09;
+  --accent-soft: #e6e2d9;
 
-  --gold: #ffc53d;
-  --gold-ink: #4a3300;
+  --gold: #a89f8f;
+  --gold-ink: #2a2620;
 
-  --danger: #d93a2b;
-  --danger-soft: #fde3e0;
+  --danger: #211f1b;
+  --danger-soft: #e5e1d8;
 
-  --success: #1f8a4c;
-  --success-soft: #dff3e6;
+  --success: #625c52;
+  --success-soft: #ecebe4;
 
   /* ── Type ── */
   --font-display: 'Space Grotesk', 'Arial Black', sans-serif;
@@ -221,19 +221,11 @@ p { margin: 0 0 1em; color: var(--ink-soft); overflow-wrap: break-word; }
 }
 
 .navbar__logo-mark {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
-  background: var(--accent);
-  border: var(--border-w-sm) solid var(--ink);
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  transform: rotate(-4deg);
+  object-fit: contain;
+  display: inline-block;
 }
 
 .navbar__links {
@@ -348,7 +340,7 @@ p { margin: 0 0 1em; color: var(--ink-soft); overflow-wrap: break-word; }
   font-family: var(--font-display);
   font-size: 1.15rem;
   padding: 14px 10px;
-  border-bottom: 2px dashed #c8c6b8;
+  border-bottom: 2px dashed #b8b2a2;
 }
 
 @media (max-width: 920px) {
@@ -385,6 +377,16 @@ p { margin: 0 0 1em; color: var(--ink-soft); overflow-wrap: break-word; }
   font-weight: 700;
   font-size: 1.2rem;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer__logo-mark {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .footer h4 {
@@ -414,7 +416,7 @@ p { margin: 0 0 1em; color: var(--ink-soft); overflow-wrap: break-word; }
 .footer a:hover { color: var(--accent); }
 
 .footer__bottom {
-  border-top: 2px dashed #c8c6b8;
+  border-top: 2px dashed #b8b2a2;
   padding-top: 18px;
   font-size: 0.85rem;
   color: var(--ink-soft);
@@ -529,10 +531,10 @@ input:focus, select:focus, textarea:focus {
 
 .badge--available { background: var(--success-soft); color: var(--success); }
 .badge--sold { background: var(--danger-soft); color: var(--danger); }
-.badge--reserved { background: #fff2cf; color: var(--gold-ink); }
+.badge--reserved { background: #e9e5da; color: var(--gold-ink); }
 .badge--featured { background: var(--gold); color: var(--gold-ink); }
 .badge--neutral { background: var(--bg-raised); color: var(--ink-soft); }
-.badge--pending { background: #fff2cf; color: var(--gold-ink); }
+.badge--pending { background: #e9e5da; color: var(--gold-ink); }
 .badge--verifying { background: var(--accent-soft); color: var(--accent-ink); }
 .badge--paid { background: var(--success-soft); color: var(--success); }
 .badge--rejected { background: var(--danger-soft); color: var(--danger); }
@@ -651,7 +653,7 @@ input:focus, select:focus, textarea:focus {
    ============================================================ */
 
 .skeleton {
-  background: linear-gradient(90deg, #e7e5d9 25%, #f1f0e6 37%, #e7e5d9 63%);
+  background: linear-gradient(90deg, #e2ded4 25%, #f6f4f0 37%, #e2ded4 63%);
   background-size: 400% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;
   border-radius: var(--radius);
