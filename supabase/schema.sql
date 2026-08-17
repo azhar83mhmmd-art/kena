@@ -1,5 +1,5 @@
 -- ============================================================
--- ARRZ MARKET — Skema Database Supabase (PostgreSQL)
+-- KENARRZ MARKET — Skema Database Supabase (PostgreSQL)
 -- Jalankan di Supabase SQL Editor
 -- ============================================================
 
@@ -108,7 +108,7 @@ create index if not exists idx_transactions_status on transactions(status);
 -- ── SITE SETTINGS (single row) ──────────────────────────────
 create table if not exists site_settings (
   id int primary key default 1,
-  site_name text not null default 'ARRZ MARKET',
+  site_name text not null default 'KENARRZ MARKET',
   logo_url text,
   admin_whatsapp text,
   admin_email text,
@@ -122,7 +122,7 @@ create table if not exists site_settings (
 );
 
 insert into site_settings (id, site_name)
-values (1, 'ARRZ MARKET')
+values (1, 'KENARRZ MARKET')
 on conflict (id) do nothing;
 
 -- ── ADMIN PROFILES ───────────────────────────────────────────
