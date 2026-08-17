@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — ARRZ MARKET</title>
+  <title>Admin — KENARRZ MARKET</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/marketplace.css" />
   <link rel="stylesheet" href="css/admin.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
 </head>
 <body class="admin-body">
 
   <div class="admin-shell" data-admin-shell style="display:none;">
     <aside class="admin-sidebar">
-      <div class="admin-sidebar__logo">ARRZ MARKET</div>
+      <div class="admin-sidebar__logo"><img src="img/logo-mark.png" alt="KENARRZ MARKET" class="admin-sidebar__logo-mark" /><span>KENARRZ MARKET</span></div>
       <button class="admin-nav-link is-active" data-tab-btn="dashboard">Dashboard</button>
       <button class="admin-nav-link" data-tab-btn="accounts">Akun</button>
       <button class="admin-nav-link" data-tab-btn="offers">Tawaran</button>
@@ -59,9 +62,12 @@
           <button class="btn btn-primary" data-open-account-drawer>+ Tambah Akun</button>
         </div>
         <div class="admin-panel">
-          <div class="field" style="max-width:340px; margin-bottom:16px;">
-            <label for="acc-table-search">Cari (Kode Akun / Nama)</label>
-            <input type="text" id="acc-table-search" data-accounts-table-search placeholder="ARZ-7F3K9X atau nama akun" autocomplete="off" />
+          <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px;">
+            <div class="field" style="max-width:340px; margin:0;">
+              <label for="acc-table-search">Cari (Kode Akun / Nama)</label>
+              <input type="text" id="acc-table-search" data-accounts-table-search placeholder="ARZ-7F3K9X atau nama akun" autocomplete="off" />
+            </div>
+            <button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-cleanup-sold-accounts title="Hapus semua akun berstatus Sold beserta transaksi terkaitnya sekaligus">Bersihkan Akun Terjual</button>
           </div>
           <div class="admin-table-wrap">
             <table class="admin-table">
@@ -75,7 +81,10 @@
       </section>
 
       <section data-tab-panel="offers" style="display:none;">
-        <div class="admin-topbar"><h1>Tawaran Harga</h1></div>
+        <div class="admin-topbar">
+          <h1>Tawaran Harga</h1>
+          <button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-cleanup-offers title="Hapus semua tawaran berstatus Selesai/Ditolak sekaligus">Bersihkan yang Selesai</button>
+        </div>
         <div class="tab-row" data-offers-filter>
           <button class="tab-btn is-active" data-status="">Semua</button>
           <button class="tab-btn" data-status="PENDING">Pending</button>
@@ -96,7 +105,10 @@
       </section>
 
       <section data-tab-panel="sell-requests" style="display:none;">
-        <div class="admin-topbar"><h1>Pengajuan Jual Akun</h1></div>
+        <div class="admin-topbar">
+          <h1>Pengajuan Jual Akun</h1>
+          <button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-cleanup-sell-requests title="Hapus semua pengajuan berstatus Diterima/Ditolak sekaligus">Bersihkan yang Selesai</button>
+        </div>
         <div class="tab-row" data-sell-requests-filter>
           <button class="tab-btn is-active" data-status="">Semua</button>
           <button class="tab-btn" data-status="PENDING">Pending</button>
@@ -117,7 +129,10 @@
       </section>
 
       <section data-tab-panel="transactions" style="display:none;">
-        <div class="admin-topbar"><h1>Transaksi Pembelian</h1></div>
+        <div class="admin-topbar">
+          <h1>Transaksi Pembelian</h1>
+          <button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-cleanup-transactions title="Hapus semua transaksi Selesai/Ditolak/Kedaluwarsa sekaligus">Bersihkan yang Selesai</button>
+        </div>
         <div class="tab-row" data-transactions-filter>
           <button class="tab-btn is-active" data-status="">Semua</button>
           <button class="tab-btn" data-status="PENDING_PAYMENT">Menunggu Pembayaran</button>
@@ -211,7 +226,7 @@
             <div class="form-grid-2">
               <div class="field">
                 <label for="set-merchant-name">Nama Penerima (ditampilkan ke pembeli)</label>
-                <input type="text" id="set-merchant-name" name="merchant_name" placeholder="ARRZ MARKET" />
+                <input type="text" id="set-merchant-name" name="merchant_name" placeholder="KENARRZ MARKET" />
               </div>
               <div class="field">
                 <label for="set-dana-name">Nama DANA Bisnis</label>
@@ -279,10 +294,39 @@
             <select id="acc-category" name="category_id"><option value="">Pilih kategori</option></select>
           </div>
           <div class="field">
-            <label for="acc-price">Harga (Rp)</label>
+            <label for="acc-price">Harga Normal (Rp)</label>
             <input type="number" id="acc-price" name="price" required min="0" />
           </div>
         </div>
+
+        <fieldset class="admin-fieldset">
+          <legend>Diskon / Harga Coret</legend>
+          <label class="checkbox-row">
+            <input type="checkbox" name="discount_active" data-discount-toggle />
+            <span>Aktifkan diskon untuk akun ini</span>
+          </label>
+          <div class="form-grid-2" data-discount-fields style="display:none; margin-top:10px;">
+            <div class="field">
+              <label for="acc-discount-price">Harga Diskon (Rp)</label>
+              <input type="number" id="acc-discount-price" name="discount_price" min="0" />
+              <span class="field__hint" data-discount-percent-preview></span>
+            </div>
+            <div class="field">
+              <label for="acc-promo-label">Label Promo (opsional)</label>
+              <input type="text" id="acc-promo-label" name="promo_label" maxlength="60" placeholder="Contoh: HEMAT 30%" />
+            </div>
+            <div class="field">
+              <label for="acc-discount-start">Mulai (opsional)</label>
+              <input type="datetime-local" id="acc-discount-start" name="discount_starts_at" />
+            </div>
+            <div class="field">
+              <label for="acc-discount-end">Berakhir (opsional)</label>
+              <input type="datetime-local" id="acc-discount-end" name="discount_ends_at" />
+            </div>
+          </div>
+          <span class="field__hint">Harga transaksi otomatis memakai harga diskon selama aktif — bukan cuma tampilan.</span>
+        </fieldset>
+
         <div class="field">
           <label for="acc-username">Username / ID (opsional)</label>
           <input type="text" id="acc-username" name="username" maxlength="200" />
@@ -314,6 +358,23 @@
             </label>
           </div>
         </div>
+
+        <fieldset class="admin-fieldset">
+          <legend>Data Login Akun (Rahasia)</legend>
+          <p style="font-size:0.8rem; opacity:0.75; margin:0 0 10px;">Tidak pernah ditampilkan ke publik. Hanya dapat dibaca pembeli setelah pesanan berstatus <strong>Selesai</strong>.</p>
+          <div class="field">
+            <label for="acc-email-login">Email Akun</label>
+            <input type="email" id="acc-email-login" name="account_email" autocomplete="off" placeholder="akun@example.com" />
+          </div>
+          <div class="field">
+            <label for="acc-password-login">Password Akun</label>
+            <div style="display:flex; gap:8px;">
+              <input type="password" id="acc-password-login" name="account_password" autocomplete="new-password" style="flex:1;" />
+              <button type="button" class="btn btn-sm" data-toggle-password="acc-password-login">Show</button>
+            </div>
+            <span class="field__hint">Kosongkan saat edit jika tidak ingin mengubah password yang tersimpan.</span>
+          </div>
+        </fieldset>
 
         <div class="field">
           <label>Foto Akun</label>
@@ -379,9 +440,16 @@
               <option value="PROCESSING">Diproses</option>
               <option value="WAITING_DELIVERY">Menunggu Penyerahan</option>
               <option value="DELIVERED">Sudah Diserahkan</option>
-              <option value="COMPLETED">Selesai</option>
             </select>
           </div>
+          <p style="font-size:0.8rem; opacity:0.75; margin:8px 0 12px;">Data akun (email &amp; password) baru ditampilkan ke pembeli setelah pesanan diselesaikan lewat tombol di bawah — bukan otomatis saat pembayaran diverifikasi.</p>
+          <div data-tx-complete-wrap>
+            <button type="button" class="btn btn-primary" data-tx-complete-btn style="width:100%;">✓ SELESAIKAN PESANAN — Tampilkan Data Akun</button>
+          </div>
+          <div data-tx-completed-badge style="display:none;">
+            <span class="badge badge--success">✅ Pesanan Selesai — data akun sudah ditampilkan ke pembeli</span>
+          </div>
+          <button type="button" class="btn btn-sm" style="width:100%; margin-top:14px; background:var(--danger-soft); color:var(--danger); display:none;" data-tx-delete-btn title="Hanya bisa dihapus jika transaksi sudah Selesai/Ditolak/Kedaluwarsa">🗑 Hapus Transaksi Ini</button>
         </div>
       </div>
     </div>
