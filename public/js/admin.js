@@ -1,5 +1,5 @@
 /* ============================================================
-   ARRZ MARKET — admin.js
+   KENARRZ MARKET — admin.js
    Dashboard admin: auth guard (Supabase Auth), tab switching,
    CRUD akun/tawaran/pengajuan/transaksi/kategori, pengaturan
    situs, realtime notif. Migrasi: semua panggilan /api/* diganti
@@ -125,7 +125,7 @@
       ];
       grid.querySelectorAll('.stat-card__value').forEach((el, idx) => (el.textContent = values[idx] ?? '—'));
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   }
 
@@ -141,7 +141,7 @@
     const submitBtn = lookupForm.querySelector('button[type="submit"]');
     const rawCode = lookupForm.querySelector('[name="code"]').value.trim();
     if (!rawCode) {
-      ARRZ.toast('Masukkan kode akun terlebih dahulu.', 'error');
+      KENARRZ.toast('Masukkan kode akun terlebih dahulu.', 'error');
       return;
     }
 
@@ -158,18 +158,18 @@
       if (error) throw error;
 
       if (!data) {
-        lookupResult.innerHTML = `<div class="admin-empty" style="padding:14px 0;">Akun dengan kode "${ARRZ.escapeAttr(rawCode)}" tidak ditemukan.</div>`;
+        lookupResult.innerHTML = `<div class="admin-empty" style="padding:14px 0;">Akun dengan kode "${KENARRZ.escapeAttr(rawCode)}" tidak ditemukan.</div>`;
         return;
       }
 
       const primary = (data.account_images || []).find((i) => i.is_primary) || data.account_images?.[0];
       lookupResult.innerHTML = `
         <div class="admin-lookup-card">
-          ${primary ? `<img class="table-thumb" style="width:56px; height:56px;" src="${ARRZ.escapeAttr(primary.image_url)}" alt="" />` : `<div class="table-thumb" style="width:56px; height:56px;"></div>`}
+          ${primary ? `<img class="table-thumb" style="width:56px; height:56px;" src="${KENARRZ.escapeAttr(primary.image_url)}" alt="" />` : `<div class="table-thumb" style="width:56px; height:56px;"></div>`}
           <div style="flex:1; min-width:0;">
-            <div class="mono" style="font-weight:700;">${ARRZ.escapeAttr(data.account_code)}</div>
-            <div style="font-weight:600;">${ARRZ.escapeAttr(data.name)} — ${ARRZ.escapeAttr(data.platform)}</div>
-            <div style="font-size:0.85rem; color:var(--ink-soft);">${ARRZ.formatRupiah(data.price)} · <span class="badge ${data.status === 'SOLD' ? 'badge--sold' : 'badge--available'}">${data.status}</span></div>
+            <div class="mono" style="font-weight:700;">${KENARRZ.escapeAttr(data.account_code)}</div>
+            <div style="font-weight:600;">${KENARRZ.escapeAttr(data.name)} — ${KENARRZ.escapeAttr(data.platform)}</div>
+            <div style="font-size:0.85rem; color:var(--ink-soft);">${KENARRZ.formatRupiah(data.price)} · <span class="badge ${data.status === 'SOLD' ? 'badge--sold' : 'badge--available'}">${data.status}</span></div>
           </div>
           <button type="button" class="btn btn-sm btn-primary" data-lookup-edit="${data.id}">Buka / Edit</button>
         </div>`;
@@ -179,7 +179,7 @@
         openAccountDrawer(data.id);
       });
     } catch (err) {
-      ARRZ.toast(err.message, 'error');
+      KENARRZ.toast(err.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Cari Akun';
@@ -197,7 +197,7 @@
       if (select) {
         select.innerHTML =
           '<option value="">Pilih kategori</option>' +
-          categoriesCache.map((c) => `<option value="${c.id}">${ARRZ.escapeAttr(c.name)}</option>`).join('');
+          categoriesCache.map((c) => `<option value="${c.id}">${KENARRZ.escapeAttr(c.name)}</option>`).join('');
       }
     } catch (e) {
       // diamkan, dropdown tetap kosong
@@ -271,11 +271,11 @@
           const primary = (acc.account_images || []).find((i) => i.is_primary) || acc.account_images?.[0];
           return `
           <tr data-account-row="${acc.id}">
-            <td>${primary ? `<img class="table-thumb" src="${ARRZ.escapeAttr(primary.image_url)}" alt="" />` : `<div class="table-thumb"></div>`}</td>
-            <td class="mono">${ARRZ.escapeAttr(acc.account_code || '')}</td>
-            <td>${ARRZ.escapeAttr(acc.name)}</td>
-            <td>${ARRZ.escapeAttr(acc.platform)}</td>
-            <td class="mono">${ARRZ.formatRupiah(acc.price)}</td>
+            <td>${primary ? `<img class="table-thumb" src="${KENARRZ.escapeAttr(primary.image_url)}" alt="" />` : `<div class="table-thumb"></div>`}</td>
+            <td class="mono">${KENARRZ.escapeAttr(acc.account_code || '')}</td>
+            <td>${KENARRZ.escapeAttr(acc.name)}</td>
+            <td>${KENARRZ.escapeAttr(acc.platform)}</td>
+            <td class="mono">${KENARRZ.formatRupiah(acc.price)}</td>
             <td><span class="badge ${acc.status === 'SOLD' ? 'badge--sold' : 'badge--available'}">${acc.status}</span></td>
             <td>${acc.featured ? '<span class="badge badge--featured">Featured</span>' : '-'}</td>
             <td class="admin-table__actions">
@@ -296,11 +296,11 @@
           try {
             const { error } = await supabaseClient.from('accounts').update({ status: newStatus }).eq('id', btn.dataset.toggleStatus);
             if (error) throw error;
-            ARRZ.toast('Status akun diperbarui.', 'success');
+            KENARRZ.toast('Status akun diperbarui.', 'success');
             loadAccountsTable();
             loadDashboard();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -310,11 +310,11 @@
           try {
             const { error } = await supabaseClient.from('accounts').delete().eq('id', btn.dataset.deleteAccount);
             if (error) throw error;
-            ARRZ.toast('Akun dihapus.', 'success');
+            KENARRZ.toast('Akun dihapus.', 'success');
             loadAccountsTable();
             loadDashboard();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -322,6 +322,48 @@
       tbody.innerHTML = `<tr><td colspan="8" class="admin-empty">Data belum dapat dimuat. Silakan coba lagi.</td></tr>`;
     }
   }
+
+  // Bersihkan massal: hapus semua akun berstatus SOLD sekaligus,
+  // beserta transaksi terkaitnya (bersih total, supaya penyimpanan
+  // server tidak penuh). account_credentials ikut terhapus otomatis
+  // lewat "on delete cascade" saat baris accounts dihapus, jadi tidak
+  // perlu dihapus manual di sini.
+  document.querySelector('[data-cleanup-sold-accounts]')?.addEventListener('click', async () => {
+    if (
+      !confirm(
+        'Hapus SEMUA akun berstatus Sold beserta riwayat transaksinya secara permanen? Data ini tidak bisa dipulihkan. Tindakan ini tidak bisa dibatalkan.'
+      )
+    )
+      return;
+    const btn = document.querySelector('[data-cleanup-sold-accounts]');
+    btn.disabled = true;
+    try {
+      const { data: soldAccounts, error: selErr } = await supabaseClient.from('accounts').select('id').eq('status', 'SOLD');
+      if (selErr) throw selErr;
+      const ids = (soldAccounts || []).map((a) => a.id);
+      if (ids.length === 0) {
+        KENARRZ.toast('Tidak ada akun berstatus Sold untuk dihapus.', 'success');
+        return;
+      }
+      const { error: txErr, count: txCount } = await supabaseClient
+        .from('transactions')
+        .delete({ count: 'exact' })
+        .in('account_id', ids);
+      if (txErr) throw txErr;
+      const { error: accErr, count: accCount } = await supabaseClient
+        .from('accounts')
+        .delete({ count: 'exact' })
+        .in('id', ids);
+      if (accErr) throw accErr;
+      KENARRZ.toast(`${accCount ?? ids.length} akun terjual dan ${txCount ?? 0} transaksi terkait berhasil dihapus.`, 'success');
+      loadAccountsTable();
+      loadDashboard();
+    } catch (e) {
+      KENARRZ.toast(e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   // ── Drawer tambah/edit akun ─────────────────────────────────
   const drawer = document.querySelector('[data-account-drawer]');
@@ -331,12 +373,48 @@
   let pendingNewImages = [];
   let editingAccountId = null;
 
+  function toDatetimeLocalValue(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function updateDiscountFieldsVisibility() {
+    const active = accountForm.discount_active.checked;
+    const wrap = accountForm.querySelector('[data-discount-fields]');
+    if (wrap) wrap.style.display = active ? '' : 'none';
+  }
+  accountForm?.querySelector('[data-discount-toggle]')?.addEventListener('change', updateDiscountFieldsVisibility);
+
+  function updateDiscountPercentPreview() {
+    const price = Number(accountForm.price.value) || 0;
+    const discountPrice = Number(accountForm.discount_price.value) || 0;
+    const preview = accountForm.querySelector('[data-discount-percent-preview]');
+    if (!preview) return;
+    if (price > 0 && discountPrice > 0 && discountPrice < price) {
+      const pct = Math.round(((price - discountPrice) / price) * 100);
+      preview.textContent = `Diskon ${pct}% (hemat ${KENARRZ.formatRupiah(price - discountPrice)})`;
+    } else {
+      preview.textContent = '';
+    }
+  }
+  accountForm?.querySelector('#acc-discount-price')?.addEventListener('input', updateDiscountPercentPreview);
+  accountForm?.querySelector('#acc-price')?.addEventListener('input', updateDiscountPercentPreview);
+
+  // (toggle show/hide password ditangani global di app.js init())
+
   function openAccountDrawer(accountId = null) {
     editingAccountId = accountId;
     pendingNewImages = [];
     accountForm.reset();
     imagesGrid.innerHTML = '';
     drawerTitle.textContent = accountId ? 'Edit Akun' : 'Tambah Akun';
+    updateDiscountFieldsVisibility();
+    updateDiscountPercentPreview();
+    const pwInput = document.getElementById('acc-password-login');
+    if (pwInput) pwInput.type = 'password';
+    document.querySelector('[data-toggle-password="acc-password-login"]').textContent = 'Show';
 
     if (categoriesCache.length === 0) loadCategoriesCache();
 
@@ -353,6 +431,13 @@
           accountForm.platform.value = data.platform;
           accountForm.category_id.value = data.category_id || '';
           accountForm.price.value = data.price;
+          accountForm.discount_active.checked = Boolean(data.discount_active);
+          accountForm.discount_price.value = data.discount_price ?? '';
+          accountForm.promo_label.value = data.promo_label || '';
+          accountForm.discount_starts_at.value = toDatetimeLocalValue(data.discount_starts_at);
+          accountForm.discount_ends_at.value = toDatetimeLocalValue(data.discount_ends_at);
+          updateDiscountFieldsVisibility();
+          updateDiscountPercentPreview();
           accountForm.username.value = data.username || '';
           accountForm.description.value = data.description || '';
           accountForm.details.value = data.details || '';
@@ -361,7 +446,19 @@
           accountForm.featured.checked = Boolean(data.featured);
           renderExistingImages(data.account_images || [], data.id);
         })
-        .catch((e) => ARRZ.toast(e.message, 'error'));
+        .catch((e) => KENARRZ.toast(e.message, 'error'));
+
+      // Kredensial akun dimuat terpisah — hanya email yang ditampilkan
+      // langsung; password TIDAK di-prefill (biar tidak pernah muncul
+      // plaintext tanpa aksi eksplisit "Show" + admin memang membuka field).
+      supabaseClient
+        .from('account_credentials')
+        .select('account_email')
+        .eq('account_id', accountId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) accountForm.account_email.value = data.account_email || '';
+        });
     }
 
     drawer.classList.add('is-open');
@@ -382,9 +479,9 @@
       const { error } = await supabaseClient.from('account_images').delete().eq('id', imageId);
       if (error) throw error;
       btnEl.closest('.image-manage-item').remove();
-      ARRZ.toast('Foto dihapus.', 'success');
+      KENARRZ.toast('Foto dihapus.', 'success');
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   }
 
@@ -393,7 +490,7 @@
       .map(
         (img) => `
       <div class="image-manage-item ${img.is_primary ? 'is-primary' : ''}" data-existing-image="${img.id}">
-        <img src="${ARRZ.escapeAttr(img.image_url)}" alt="" />
+        <img src="${KENARRZ.escapeAttr(img.image_url)}" alt="" />
         <button type="button" class="image-manage-item__remove" data-remove-existing-image="${img.id}">×</button>
       </div>`
       )
@@ -453,11 +550,11 @@
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     for (const file of Array.from(fileList)) {
       if (!validTypes.includes(file.type)) {
-        ARRZ.toast(`${file.name}: format tidak didukung.`, 'error');
+        KENARRZ.toast(`${file.name}: format tidak didukung.`, 'error');
         continue;
       }
       if (file.size > 5 * 1024 * 1024) {
-        ARRZ.toast(`${file.name}: ukuran melebihi 5MB.`, 'error');
+        KENARRZ.toast(`${file.name}: ukuran melebihi 5MB.`, 'error');
         continue;
       }
       pendingNewImages.push({ file, previewUrl: URL.createObjectURL(file) });
@@ -495,7 +592,7 @@
         .from('account-images')
         .upload(path, file, { contentType: file.type, upsert: false });
       if (uploadErr) {
-        ARRZ.toast(`${file.name}: gagal diunggah (${uploadErr.message}).`, 'error');
+        KENARRZ.toast(`${file.name}: gagal diunggah (${uploadErr.message}).`, 'error');
         continue;
       }
       const { data: publicUrlData } = supabaseClient.storage.from('account-images').getPublicUrl(path);
@@ -519,11 +616,27 @@
     submitBtn.textContent = 'Menyimpan...';
 
     try {
+      const price = Number(accountForm.price.value);
+      const discountActive = accountForm.discount_active.checked;
+      const discountPriceRaw = accountForm.discount_price.value;
+      const discountPrice = discountActive && discountPriceRaw !== '' ? Number(discountPriceRaw) : null;
+      if (discountActive) {
+        if (discountPrice === null) throw new Error('Isi harga diskon atau nonaktifkan diskon.');
+        if (discountPrice >= price) throw new Error('Harga diskon harus lebih kecil dari harga normal.');
+      }
+      const startsAt = accountForm.discount_starts_at.value ? new Date(accountForm.discount_starts_at.value).toISOString() : null;
+      const endsAt = accountForm.discount_ends_at.value ? new Date(accountForm.discount_ends_at.value).toISOString() : null;
+
       const payload = {
         name: accountForm.name.value.trim(),
         platform: accountForm.platform.value.trim(),
         category_id: accountForm.category_id.value || null,
-        price: Number(accountForm.price.value),
+        price,
+        discount_active: discountActive,
+        discount_price: discountActive ? discountPrice : null,
+        promo_label: accountForm.promo_label.value.trim() || null,
+        discount_starts_at: discountActive ? startsAt : null,
+        discount_ends_at: discountActive ? endsAt : null,
         username: accountForm.username.value.trim(),
         description: accountForm.description.value.trim(),
         details: accountForm.details.value.trim(),
@@ -543,14 +656,28 @@
         accountId = data.id;
       }
 
+      // Kredensial akun (email/password) — tabel terpisah, jangan pernah
+      // dikirim sebagai bagian dari payload accounts di atas.
+      const credEmail = accountForm.account_email.value.trim();
+      const credPassword = accountForm.account_password.value;
+      if (credEmail || credPassword) {
+        const credPayload = { account_id: accountId };
+        if (credEmail) credPayload.account_email = credEmail;
+        if (credPassword) credPayload.account_password = credPassword;
+        const { error: credError } = await supabaseClient
+          .from('account_credentials')
+          .upsert(credPayload, { onConflict: 'account_id' });
+        if (credError) throw credError;
+      }
+
       await uploadPendingImages(accountId);
 
-      ARRZ.toast('Akun berhasil disimpan.', 'success');
+      KENARRZ.toast('Akun berhasil disimpan.', 'success');
       closeAccountDrawer();
       loadAccountsTable();
       loadDashboard();
     } catch (err) {
-      ARRZ.toast(err.message, 'error');
+      KENARRZ.toast(err.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Simpan Akun';
@@ -584,11 +711,11 @@
         .map(
           (offer) => `
         <tr>
-          <td>${ARRZ.escapeAttr(offer.accounts?.name || '-')}</td>
-          <td class="mono">${ARRZ.formatRupiah(offer.original_price)}</td>
-          <td class="mono">${ARRZ.formatRupiah(offer.offer_price)}</td>
-          <td>${ARRZ.escapeAttr(offer.buyer_name)}</td>
-          <td class="mono">${ARRZ.escapeAttr(offer.buyer_whatsapp)}</td>
+          <td>${KENARRZ.escapeAttr(offer.accounts?.name || '-')}</td>
+          <td class="mono">${KENARRZ.formatRupiah(offer.original_price)}</td>
+          <td class="mono">${KENARRZ.formatRupiah(offer.offer_price)}</td>
+          <td>${KENARRZ.escapeAttr(offer.buyer_name)}</td>
+          <td class="mono">${KENARRZ.escapeAttr(offer.buyer_whatsapp)}</td>
           <td><span class="badge badge--neutral">${offer.status}</span></td>
           <td class="admin-table__actions">
             ${offer.status === 'PENDING' ? `
@@ -596,6 +723,7 @@
               <button class="btn btn-sm" data-offer-action="${offer.id}" data-offer-status="REJECTED">Tolak</button>
             ` : ''}
             ${offer.status === 'ACCEPTED' ? `<button class="btn btn-sm" data-offer-action="${offer.id}" data-offer-status="COMPLETED">Selesai</button>` : ''}
+            ${['REJECTED', 'COMPLETED'].includes(offer.status) ? `<button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-delete-offer="${offer.id}" title="Hapus tawaran yang sudah selesai">Hapus</button>` : ''}
           </td>
         </tr>`
         )
@@ -609,11 +737,28 @@
               .update({ status: btn.dataset.offerStatus })
               .eq('id', btn.dataset.offerAction);
             if (error) throw error;
-            ARRZ.toast('Status tawaran diperbarui.', 'success');
+            KENARRZ.toast('Status tawaran diperbarui.', 'success');
             loadOffersTable();
             loadDashboard();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
+          }
+        });
+      });
+
+      // Hapus satu tawaran (hanya yang sudah selesai/ditolak) — mengurangi
+      // jumlah baris di tabel `offers` supaya query & realtime tetap ringan.
+      tbody.querySelectorAll('[data-delete-offer]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Hapus tawaran ini secara permanen? Tindakan ini tidak bisa dibatalkan.')) return;
+          try {
+            const { error } = await supabaseClient.from('offers').delete().eq('id', btn.dataset.deleteOffer);
+            if (error) throw error;
+            KENARRZ.toast('Tawaran dihapus.', 'success');
+            loadOffersTable();
+            loadDashboard();
+          } catch (e) {
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -621,6 +766,24 @@
       tbody.innerHTML = `<tr><td colspan="7" class="admin-empty">Data belum dapat dimuat. Silakan coba lagi.</td></tr>`;
     }
   }
+
+  // Bersihkan massal: hapus semua tawaran berstatus REJECTED/COMPLETED
+  // sekaligus, supaya admin tidak perlu klik Hapus satu-satu.
+  document.querySelector('[data-cleanup-offers]')?.addEventListener('click', async () => {
+    if (!confirm('Hapus SEMUA tawaran yang sudah Diterima-Selesai atau Ditolak? Tindakan ini tidak bisa dibatalkan.')) return;
+    try {
+      const { error, count } = await supabaseClient
+        .from('offers')
+        .delete({ count: 'exact' })
+        .in('status', ['REJECTED', 'COMPLETED']);
+      if (error) throw error;
+      KENARRZ.toast(`${count ?? 0} tawaran selesai berhasil dihapus.`, 'success');
+      loadOffersTable();
+      loadDashboard();
+    } catch (e) {
+      KENARRZ.toast(e.message, 'error');
+    }
+  });
 
   document.querySelectorAll('[data-offers-filter] .tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -655,10 +818,10 @@
         .map(
           (req) => `
         <tr>
-          <td>${ARRZ.escapeAttr(req.account_name)}<br/><span style="font-size:0.78rem; color:var(--ink-soft);">${ARRZ.escapeAttr(req.platform)}</span></td>
-          <td>${ARRZ.escapeAttr(req.seller_name)}</td>
-          <td class="mono">${ARRZ.escapeAttr(req.seller_whatsapp)}</td>
-          <td class="mono">${req.desired_price ? ARRZ.formatRupiah(req.desired_price) : '-'}</td>
+          <td>${KENARRZ.escapeAttr(req.account_name)}<br/><span style="font-size:0.78rem; color:var(--ink-soft);">${KENARRZ.escapeAttr(req.platform)}</span></td>
+          <td>${KENARRZ.escapeAttr(req.seller_name)}</td>
+          <td class="mono">${KENARRZ.escapeAttr(req.seller_whatsapp)}</td>
+          <td class="mono">${req.desired_price ? KENARRZ.formatRupiah(req.desired_price) : '-'}</td>
           <td><span class="badge badge--neutral">${req.status}</span></td>
           <td class="admin-table__actions">
             ${req.status === 'PENDING' ? `<button class="btn btn-sm" data-sr-action="${req.id}" data-sr-status="REVIEW">Review</button>` : ''}
@@ -667,6 +830,7 @@
               <button class="btn btn-sm" data-sr-action="${req.id}" data-sr-status="REJECTED">Tolak</button>
             ` : ''}
             ${req.status === 'ACCEPTED' ? `<button class="btn btn-sm btn-primary" data-sr-convert="${req.id}">+ Marketplace</button>` : ''}
+            ${['REJECTED', 'ACCEPTED'].includes(req.status) ? `<button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-delete-sr="${req.id}" title="Hapus pengajuan yang sudah selesai">Hapus</button>` : ''}
           </td>
         </tr>`
         )
@@ -680,11 +844,29 @@
               .update({ status: btn.dataset.srStatus })
               .eq('id', btn.dataset.srAction);
             if (error) throw error;
-            ARRZ.toast('Status pengajuan diperbarui.', 'success');
+            KENARRZ.toast('Status pengajuan diperbarui.', 'success');
             loadSellRequestsTable();
             loadDashboard();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
+          }
+        });
+      });
+
+      // Hapus satu pengajuan jual (hanya yang sudah Diterima/sudah masuk
+      // marketplace atau Ditolak) — tabel `sell_requests` menyimpan foto &
+      // kredensial akun sehingga baris lama sebaiknya dibersihkan berkala.
+      tbody.querySelectorAll('[data-delete-sr]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Hapus pengajuan jual ini secara permanen? Pastikan sudah dipindahkan ke marketplace jika perlu. Tindakan ini tidak bisa dibatalkan.')) return;
+          try {
+            const { error } = await supabaseClient.from('sell_requests').delete().eq('id', btn.dataset.deleteSr);
+            if (error) throw error;
+            KENARRZ.toast('Pengajuan dihapus.', 'success');
+            loadSellRequestsTable();
+            loadDashboard();
+          } catch (e) {
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -694,11 +876,11 @@
           if (!confirm('Tambahkan pengajuan ini sebagai akun baru di marketplace?')) return;
           try {
             await convertSellRequestToAccount(btn.dataset.srConvert);
-            ARRZ.toast('Akun berhasil ditambahkan ke marketplace.', 'success');
+            KENARRZ.toast('Akun berhasil ditambahkan ke marketplace.', 'success');
             loadSellRequestsTable();
             loadDashboard();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -706,6 +888,23 @@
       tbody.innerHTML = `<tr><td colspan="6" class="admin-empty">Data belum dapat dimuat. Silakan coba lagi.</td></tr>`;
     }
   }
+
+  // Bersihkan massal: hapus semua pengajuan berstatus REJECTED/ACCEPTED.
+  document.querySelector('[data-cleanup-sell-requests]')?.addEventListener('click', async () => {
+    if (!confirm('Hapus SEMUA pengajuan yang sudah Diterima atau Ditolak? Pastikan yang perlu masuk marketplace sudah dikonversi. Tindakan ini tidak bisa dibatalkan.')) return;
+    try {
+      const { error, count } = await supabaseClient
+        .from('sell_requests')
+        .delete({ count: 'exact' })
+        .in('status', ['REJECTED', 'ACCEPTED']);
+      if (error) throw error;
+      KENARRZ.toast(`${count ?? 0} pengajuan selesai berhasil dihapus.`, 'success');
+      loadSellRequestsTable();
+      loadDashboard();
+    } catch (e) {
+      KENARRZ.toast(e.message, 'error');
+    }
+  });
 
   // Dulu POST /api/sell-requests/:id/convert (server). Sekarang beberapa
   // langkah Supabase berurutan (aman karena hanya admin yang lolos RLS).
@@ -823,17 +1022,18 @@
           const badgeClass = PAYMENT_STATUS_BADGE[tx.payment_status] || 'badge--neutral';
           return `
         <tr>
-          <td class="mono">${ARRZ.escapeAttr(tx.invoice_id || '-')}</td>
-          <td>${ARRZ.escapeAttr(tx.accounts?.name || '-')}</td>
+          <td class="mono">${KENARRZ.escapeAttr(tx.invoice_id || '-')}</td>
+          <td>${KENARRZ.escapeAttr(tx.accounts?.name || '-')}</td>
           <td>
-            <div>${ARRZ.escapeAttr(tx.buyer_email || '-')}</div>
-            <div class="mono" style="font-size:0.78rem; opacity:0.75;">${ARRZ.escapeAttr(tx.buyer_whatsapp || '-')}</div>
+            <div>${KENARRZ.escapeAttr(tx.buyer_email || '-')}</div>
+            <div class="mono" style="font-size:0.78rem; opacity:0.75;">${KENARRZ.escapeAttr(tx.buyer_whatsapp || '-')}</div>
           </td>
-          <td class="mono">${ARRZ.formatRupiah(tx.price)}</td>
-          <td><span class="badge ${badgeClass}">${ARRZ.escapeAttr(label)}</span></td>
+          <td class="mono">${KENARRZ.formatRupiah(tx.price)}</td>
+          <td><span class="badge ${badgeClass}">${KENARRZ.escapeAttr(label)}</span></td>
           <td style="font-size:0.78rem;">${fmtDateTime(tx.payment_submitted_at)}</td>
           <td class="admin-table__actions">
             <button class="btn btn-sm" data-tx-detail-btn="${tx.id}">Detail</button>
+            ${['REJECTED', 'EXPIRED'].includes(tx.payment_status) || tx.transaction_status === 'COMPLETED' ? `<button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-delete-tx="${tx.id}" title="Hapus transaksi yang sudah selesai/ditolak/kedaluwarsa">Hapus</button>` : ''}
           </td>
         </tr>`;
         })
@@ -842,10 +1042,47 @@
       tbody.querySelectorAll('[data-tx-detail-btn]').forEach((btn) => {
         btn.addEventListener('click', () => openTxDetail(btn.dataset.txDetailBtn, data));
       });
+
+      // Hapus satu transaksi (hanya yang sudah Selesai/Ditolak/Kedaluwarsa)
+      // — tabel `transactions` paling cepat membesar, jadi paling penting
+      // dibersihkan berkala supaya query & realtime Supabase tetap ringan.
+      tbody.querySelectorAll('[data-delete-tx]').forEach((btn) => {
+        btn.addEventListener('click', async (ev) => {
+          ev.stopPropagation();
+          if (!confirm('Hapus transaksi ini secara permanen (termasuk riwayat pembayarannya)? Tindakan ini tidak bisa dibatalkan.')) return;
+          try {
+            const { error } = await supabaseClient.from('transactions').delete().eq('id', btn.dataset.deleteTx);
+            if (error) throw error;
+            KENARRZ.toast('Transaksi dihapus.', 'success');
+            loadTransactionsTable();
+            loadDashboard();
+          } catch (e) {
+            KENARRZ.toast(e.message, 'error');
+          }
+        });
+      });
     } catch (e) {
       tbody.innerHTML = `<tr><td colspan="7" class="admin-empty">Data belum dapat dimuat. Silakan coba lagi.</td></tr>`;
     }
   }
+
+  // Bersihkan massal: hapus semua transaksi yang sudah final (Selesai,
+  // Ditolak, atau Kedaluwarsa) sekaligus.
+  document.querySelector('[data-cleanup-transactions]')?.addEventListener('click', async () => {
+    if (!confirm('Hapus SEMUA transaksi yang sudah Selesai, Ditolak, atau Kedaluwarsa? Riwayat pembayarannya ikut terhapus permanen. Tindakan ini tidak bisa dibatalkan.')) return;
+    try {
+      const { error, count } = await supabaseClient
+        .from('transactions')
+        .delete({ count: 'exact' })
+        .or('payment_status.in.(REJECTED,EXPIRED),transaction_status.eq.COMPLETED');
+      if (error) throw error;
+      KENARRZ.toast(`${count ?? 0} transaksi selesai berhasil dihapus.`, 'success');
+      loadTransactionsTable();
+      loadDashboard();
+    } catch (e) {
+      KENARRZ.toast(e.message, 'error');
+    }
+  });
 
   document.querySelectorAll('[data-transactions-filter] .tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -877,7 +1114,7 @@
     document.querySelector('[data-tx-account-code]').textContent = tx.accounts?.account_code || '-';
     document.querySelector('[data-tx-platform]').textContent = tx.accounts?.platform || '-';
     document.querySelector('[data-tx-category]').textContent = '-';
-    document.querySelector('[data-tx-price]').textContent = ARRZ.formatRupiah(tx.price);
+    document.querySelector('[data-tx-price]').textContent = KENARRZ.formatRupiah(tx.price);
     document.querySelector('[data-tx-email]').textContent = tx.buyer_email || '-';
     document.querySelector('[data-tx-whatsapp]').textContent = tx.buyer_whatsapp || '-';
     document.querySelector('[data-tx-instagram]').textContent = tx.buyer_instagram || '-';
@@ -910,7 +1147,7 @@
       if (signErr || !signed?.signedUrl) {
         proofWrap.innerHTML = `<p style="font-size:0.85rem;">Bukti pembayaran tidak dapat dimuat.</p>`;
       } else {
-        proofWrap.innerHTML = `<img class="tx-proof-img" src="${ARRZ.escapeAttr(signed.signedUrl)}" alt="Bukti pembayaran" data-tx-proof-zoom />`;
+        proofWrap.innerHTML = `<img class="tx-proof-img" src="${KENARRZ.escapeAttr(signed.signedUrl)}" alt="Bukti pembayaran" data-tx-proof-zoom />`;
         proofWrap.querySelector('[data-tx-proof-zoom]')?.addEventListener('click', () => {
           openProofZoom(signed.signedUrl);
         });
@@ -938,13 +1175,46 @@
     approveBtn.disabled = !canVerify;
     rejectBtn.disabled = !canVerify;
 
-    deliveryWrap.style.display = tx.payment_status === 'PAID' || tx.payment_status === 'COMPLETED' ? '' : 'none';
+    deliveryWrap.style.display = tx.payment_status === 'PAID' ? '' : 'none';
+    const isCompleted = tx.transaction_status === 'COMPLETED';
     if (deliveryWrap.style.display !== 'none') {
-      document.querySelector('[data-tx-delivery-select]').value = tx.transaction_status || 'PROCESSING';
+      document.querySelector('[data-tx-delivery-select]').value =
+        ['PROCESSING', 'WAITING_DELIVERY', 'DELIVERED'].includes(tx.transaction_status) ? tx.transaction_status : 'PROCESSING';
+      document.querySelector('[data-tx-delivery-select]').disabled = isCompleted;
+    }
+    const completeWrap = document.querySelector('[data-tx-complete-wrap]');
+    const completedBadge = document.querySelector('[data-tx-completed-badge]');
+    if (completeWrap) completeWrap.style.display = isCompleted ? 'none' : '';
+    if (completedBadge) completedBadge.style.display = isCompleted ? '' : 'none';
+
+    const deleteTxBtn = document.querySelector('[data-tx-delete-btn]');
+    if (deleteTxBtn) {
+      const isFinal = ['REJECTED', 'EXPIRED'].includes(tx.payment_status) || isCompleted;
+      deleteTxBtn.style.display = isFinal ? '' : 'none';
     }
 
     txDrawer.classList.add('is-open');
   }
+
+  // ── Hapus transaksi dari drawer detail ──────────────────────
+  document.querySelector('[data-tx-delete-btn]')?.addEventListener('click', async () => {
+    if (!currentTxDetail) return;
+    if (!confirm('Hapus transaksi ini secara permanen (termasuk riwayat pembayarannya)? Tindakan ini tidak bisa dibatalkan.')) return;
+    const btn = document.querySelector('[data-tx-delete-btn]');
+    btn.disabled = true;
+    try {
+      const { error } = await supabaseClient.from('transactions').delete().eq('id', currentTxDetail.id);
+      if (error) throw error;
+      KENARRZ.toast('Transaksi dihapus.', 'success');
+      closeTxDrawer();
+      loadTransactionsTable();
+      loadDashboard();
+    } catch (e) {
+      KENARRZ.toast(e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   function openProofZoom(url) {
     let overlay = document.querySelector('.tx-proof-img-overlay');
@@ -964,7 +1234,7 @@
   document.querySelector('[data-tx-approve-btn]')?.addEventListener('click', () => {
     if (!currentTxDetail) return;
     document.querySelector('[data-tx-approve-confirm-text]').textContent =
-      `Pastikan pembayaran sebesar ${ARRZ.formatRupiah(currentTxDetail.price)} benar-benar sudah masuk ke DANA Bisnis ARRZ MARKET.`;
+      `Pastikan pembayaran sebesar ${KENARRZ.formatRupiah(currentTxDetail.price)} benar-benar sudah masuk ke DANA Bisnis KENARRZ MARKET.`;
     approveModal.classList.add('is-open');
   });
   document.querySelectorAll('[data-tx-approve-modal] [data-modal-close]').forEach((btn) => {
@@ -983,14 +1253,14 @@
         if ((error.message || '').includes('sudah diverifikasi')) throw new Error('Transaksi ini sudah diverifikasi.');
         throw error;
       }
-      ARRZ.toast('Pembayaran diverifikasi. Akun ditandai SOLD.', 'success');
+      KENARRZ.toast('Pembayaran diverifikasi. Akun ditandai SOLD.', 'success');
       approveModal.classList.remove('is-open');
       closeTxDrawer();
       loadTransactionsTable();
       loadAccountsTable();
       loadDashboard();
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       btn.disabled = false;
     }
@@ -1013,7 +1283,7 @@
     e.preventDefault();
     if (!currentTxDetail) return;
     const reason = e.target.rejection_reason.value.trim();
-    if (!reason) return ARRZ.toast('Alasan penolakan wajib diisi.', 'error');
+    if (!reason) return KENARRZ.toast('Alasan penolakan wajib diisi.', 'error');
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     try {
@@ -1022,31 +1292,93 @@
         .update({ payment_status: 'REJECTED', rejection_reason: reason })
         .eq('id', currentTxDetail.id);
       if (error) throw error;
-      ARRZ.toast('Pembayaran ditolak. Akun dikembalikan ke status Available.', 'success');
+      KENARRZ.toast('Pembayaran ditolak. Akun dikembalikan ke status Available.', 'success');
       rejectModal.classList.remove('is-open');
       closeTxDrawer();
       loadTransactionsTable();
       loadAccountsTable();
       loadDashboard();
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       submitBtn.disabled = false;
     }
   });
 
-  // ── Status penyerahan akun (pasca PAID) ─────────────────────
+  // ── Status penyerahan akun (pasca PAID, sebelum selesai) ────
   document.querySelector('[data-tx-delivery-select]')?.addEventListener('change', async (e) => {
     if (!currentTxDetail) return;
     try {
-      const updates = { transaction_status: e.target.value };
-      if (e.target.value === 'COMPLETED') updates.completed_at = new Date().toISOString();
-      const { error } = await supabaseClient.from('transactions').update(updates).eq('id', currentTxDetail.id);
+      const { error } = await supabaseClient
+        .from('transactions')
+        .update({ transaction_status: e.target.value })
+        .eq('id', currentTxDetail.id);
       if (error) throw error;
-      ARRZ.toast('Status penyerahan diperbarui.', 'success');
+      KENARRZ.toast('Status penyerahan diperbarui.', 'success');
       loadTransactionsTable();
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
+    }
+  });
+
+  // ── SELESAIKAN PESANAN (baru di sini data akun boleh tampil) ─
+  // FIX: sebelumnya pakai currentTxDetail.payment_status yang bisa stale
+  // (data drawer lama, belum tentu sinkron dengan DB), sehingga kadang
+  // membandingkan status basi. Sekarang ambil ulang status fresh dari
+  // server tepat sebelum memanggil RPC, dan error dari RPC ditampilkan
+  // apa adanya (termasuk kode error Postgres) supaya tidak ada lagi
+  // dugaan — pesan error yang tampil akan selalu persis dari database.
+  document.querySelector('[data-tx-complete-btn]')?.addEventListener('click', async () => {
+    if (!currentTxDetail) return;
+    if (!confirm('Selesaikan pesanan ini? Email & password akun akan langsung dapat dilihat pembeli di halaman status transaksinya.')) return;
+    const btn = document.querySelector('[data-tx-complete-btn]');
+    btn.disabled = true;
+    try {
+      // Ambil ulang status transaksi fresh dari DB, jangan percaya cache drawer.
+      const { data: freshTx, error: freshErr } = await supabaseClient
+        .from('transactions')
+        .select('id, invoice_id, payment_status, transaction_status')
+        .eq('id', currentTxDetail.id)
+        .single();
+      if (freshErr) throw freshErr;
+      if (!freshTx) throw new Error('Transaksi tidak ditemukan di database.');
+      if (freshTx.transaction_status === 'COMPLETED') {
+        KENARRZ.toast('Pesanan ini sudah COMPLETED sebelumnya.', 'success');
+        closeTxDrawer();
+        loadTransactionsTable();
+        return;
+      }
+      if (freshTx.payment_status !== 'PAID') {
+        KENARRZ.toast(`Belum bisa diselesaikan: payment_status saat ini masih "${freshTx.payment_status}", bukan PAID.`, 'error');
+        return;
+      }
+
+      const { data: rpcData, error } = await supabaseClient.rpc('complete_transaction', { p_invoice_id: freshTx.invoice_id });
+
+      if (error) {
+        // Tampilkan pesan error MENTAH dari Postgres/Supabase, tanpa
+        // ditimpa/di-mapping ke pesan lain apa pun, supaya akar masalah
+        // selalu terlihat jelas kalau masih gagal di masa depan.
+        console.error('complete_transaction RPC error:', error);
+        KENARRZ.toast(`Gagal menyelesaikan pesanan: ${error.message || error.code || 'error tidak diketahui'}`, 'error');
+        return;
+      }
+
+      const resultRow = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+      if (!resultRow || resultRow.transaction_status !== 'COMPLETED') {
+        KENARRZ.toast('RPC berhasil dipanggil tapi hasilnya tidak sesuai ekspektasi. Cek database secara manual.', 'error');
+        console.warn('complete_transaction unexpected result:', rpcData);
+        return;
+      }
+
+      KENARRZ.toast('Pesanan selesai. Data akun kini tampil untuk pembeli.', 'success');
+      closeTxDrawer();
+      loadTransactionsTable();
+    } catch (e) {
+      console.error('complete_transaction exception:', e);
+      KENARRZ.toast(`Gagal menyelesaikan pesanan: ${e.message || 'error tidak diketahui'}`, 'error');
+    } finally {
+      btn.disabled = false;
     }
   });
 
@@ -1080,8 +1412,8 @@
         .map(
           (cat) => `
         <tr>
-          <td>${ARRZ.escapeAttr(cat.name)}</td>
-          <td class="mono">${ARRZ.escapeAttr(cat.slug)}</td>
+          <td>${KENARRZ.escapeAttr(cat.name)}</td>
+          <td class="mono">${KENARRZ.escapeAttr(cat.slug)}</td>
           <td class="admin-table__actions">
             <button class="btn btn-sm" style="background:var(--danger-soft); color:var(--danger);" data-delete-category="${cat.id}">Hapus</button>
           </td>
@@ -1095,10 +1427,10 @@
           try {
             const { error } = await supabaseClient.from('categories').delete().eq('id', btn.dataset.deleteCategory);
             if (error) throw error;
-            ARRZ.toast('Kategori dihapus.', 'success');
+            KENARRZ.toast('Kategori dihapus.', 'success');
             loadCategoriesTable();
           } catch (e) {
-            ARRZ.toast(e.message, 'error');
+            KENARRZ.toast(e.message, 'error');
           }
         });
       });
@@ -1119,11 +1451,11 @@
         if (error.code === '23505') throw new Error('Kategori dengan nama tersebut sudah ada.');
         throw error;
       }
-      ARRZ.toast('Kategori ditambahkan.', 'success');
+      KENARRZ.toast('Kategori ditambahkan.', 'success');
       form.reset();
       loadCategoriesTable();
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       submitBtn.disabled = false;
     }
@@ -1155,7 +1487,7 @@
 
       renderQrisPreview(data?.qris_image_path);
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   }
 
@@ -1168,7 +1500,7 @@
     }
     const { data } = supabaseClient.storage.from('payment-assets').getPublicUrl(path);
     preview.innerHTML = data?.publicUrl
-      ? `<img src="${ARRZ.escapeAttr(data.publicUrl)}" alt="QRIS DANA Bisnis" style="width:100%; border:var(--border-w-sm) solid var(--border); border-radius:var(--radius);" />`
+      ? `<img src="${KENARRZ.escapeAttr(data.publicUrl)}" alt="QRIS DANA Bisnis" style="width:100%; border:var(--border-w-sm) solid var(--border); border-radius:var(--radius);" />`
       : `<div class="admin-empty" style="padding:20px;">QRIS tidak dapat dimuat</div>`;
   }
 
@@ -1195,8 +1527,8 @@
     const file = e.target.files[0];
     if (!file) return;
     const ext = extFromMimeQris(file.type);
-    if (!ext) return ARRZ.toast('Format foto tidak didukung.', 'error');
-    if (file.size > 5 * 1024 * 1024) return ARRZ.toast('Ukuran foto maksimal 5 MB.', 'error');
+    if (!ext) return KENARRZ.toast('Format foto tidak didukung.', 'error');
+    if (file.size > 5 * 1024 * 1024) return KENARRZ.toast('Ukuran foto maksimal 5 MB.', 'error');
 
     try {
       const path = `qris-dana-business-${Date.now()}.${ext}`;
@@ -1216,9 +1548,9 @@
       }
 
       renderQrisPreview(path);
-      ARRZ.toast('QRIS berhasil diperbarui.', 'success');
+      KENARRZ.toast('QRIS berhasil diperbarui.', 'success');
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       e.target.value = '';
     }
@@ -1233,9 +1565,9 @@
       if (error) throw error;
       if (oldPath) await supabaseClient.storage.from('payment-assets').remove([oldPath]);
       renderQrisPreview(null);
-      ARRZ.toast('QRIS dihapus.', 'success');
+      KENARRZ.toast('QRIS dihapus.', 'success');
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     }
   });
 
@@ -1259,9 +1591,9 @@
         })
         .eq('id', 1);
       if (error) throw error;
-      ARRZ.toast('Pengaturan pembayaran disimpan.', 'success');
+      KENARRZ.toast('Pengaturan pembayaran disimpan.', 'success');
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Simpan Pengaturan Pembayaran';
@@ -1287,9 +1619,9 @@
         })
         .eq('id', 1);
       if (error) throw error;
-      ARRZ.toast('Pengaturan disimpan.', 'success');
+      KENARRZ.toast('Pengaturan disimpan.', 'success');
     } catch (e) {
-      ARRZ.toast(e.message, 'error');
+      KENARRZ.toast(e.message, 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Simpan Pengaturan';
@@ -1304,9 +1636,9 @@
     const activeTab = () => document.querySelector('[data-tab-btn].is-active')?.dataset.tabBtn;
 
     const channel = supabaseClient
-      .channel('arrz-market-admin')
+      .channel('kenarrz-market-admin')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, () => {
-        ARRZ.toast('Tawaran baru masuk!', 'info');
+        KENARRZ.toast('Tawaran baru masuk!', 'info');
         loadDashboard();
         if (activeTab() === 'offers') loadOffersTable();
       })
@@ -1314,7 +1646,7 @@
         if (activeTab() === 'offers') loadOffersTable();
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sell_requests' }, () => {
-        ARRZ.toast('Pengajuan jual akun baru masuk!', 'info');
+        KENARRZ.toast('Pengajuan jual akun baru masuk!', 'info');
         loadDashboard();
         if (activeTab() === 'sell-requests') loadSellRequestsTable();
       })
@@ -1322,14 +1654,14 @@
         if (activeTab() === 'sell-requests') loadSellRequestsTable();
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, () => {
-        ARRZ.toast('Ada permintaan pembelian baru!', 'info');
+        KENARRZ.toast('Ada permintaan pembelian baru!', 'info');
         loadDashboard();
         if (activeTab() === 'transactions') loadTransactionsTable();
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transactions' }, (payload) => {
         if (activeTab() === 'transactions') loadTransactionsTable();
         if (payload.new?.payment_status === 'PROOF_SUBMITTED') {
-          ARRZ.toast('Bukti pembayaran baru masuk, perlu diverifikasi.', 'info');
+          KENARRZ.toast('Bukti pembayaran baru masuk, perlu diverifikasi.', 'info');
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, () => {
