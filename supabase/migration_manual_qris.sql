@@ -1,4 +1,4 @@
--- ARRZ MARKET — QRIS DANA Bisnis MANUAL (ringkas, idempotent)
+-- KENARRZ MARKET — QRIS DANA Bisnis MANUAL (ringkas, idempotent)
 -- Jalankan setelah schema.sql + migration_pure_supabase.sql.
 
 alter table accounts drop constraint if exists accounts_status_check;
@@ -55,7 +55,7 @@ alter table transactions drop constraint if exists transactions_transaction_stat
 alter table transactions add constraint transactions_transaction_status_check
   check (transaction_status in ('PENDING','PROCESSING','WAITING_DELIVERY','DELIVERED','COMPLETED','CANCELLED'));
 
-alter table site_settings add column if not exists merchant_name text default 'ARRZ MARKET';
+alter table site_settings add column if not exists merchant_name text default 'KENARRZ MARKET';
 alter table site_settings add column if not exists dana_business_name text;
 alter table site_settings add column if not exists dana_business_number text;
 alter table site_settings add column if not exists qris_image_path text;
@@ -73,7 +73,7 @@ create policy "Admin kelola transactions" on transactions for all using (public.
 create or replace function public.generate_invoice_id() returns text language plpgsql as $$
 declare c text; begin
   loop
-    c := 'ARRZ-' || to_char(now(),'YYYYMMDD') || '-' || upper(substr(md5(gen_random_uuid()::text||clock_timestamp()::text),1,6));
+    c := 'KENARRZ-' || to_char(now(),'YYYYMMDD') || '-' || upper(substr(md5(gen_random_uuid()::text||clock_timestamp()::text),1,6));
     exit when not exists (select 1 from transactions where invoice_id = c);
   end loop;
   return c;
@@ -150,10 +150,14 @@ create or replace function public.submit_payment_proof(
 language plpgsql security definer set search_path = public as $$
 declare v_tx transactions%rowtype;
 begin
-  select * into v_tx from transactions where invoice_id = p_invoice_id for update;
+  -- PENTING: "invoice_id" wajib diberi alias tabel di WHERE, karena
+  -- parameter OUT fungsi ini juga bernama "invoice_id" (dari RETURNS
+  -- TABLE) — tanpa alias, Postgres menganggapnya ambigu antara kolom
+  -- tabel dan variabel OUT ("column reference invoice_id is ambiguous").
+  select * into v_tx from transactions where transactions.invoice_id = p_invoice_id for update;
   if not found then raise exception 'TRANSAKSI_TIDAK_DITEMUKAN'; end if;
   if v_tx.payment_status='PENDING_PAYMENT' and v_tx.expires_at is not null and v_tx.expires_at < now() then
-    update transactions set payment_status='EXPIRED' where id=v_tx.id;
+    update transactions set payment_status='EXPIRED' where transactions.id=v_tx.id;
     raise exception 'TRANSAKSI_KEDALUWARSA';
   end if;
   if v_tx.payment_status in ('PROOF_SUBMITTED','VERIFYING','PAID','COMPLETED') then raise exception 'BUKTI_SUDAH_DIKIRIM'; end if;
@@ -164,7 +168,7 @@ begin
   if p_payment_proof_path is null or btrim(p_payment_proof_path)='' then raise exception 'BUKTI_PEMBAYARAN_WAJIB_DIUPLOAD'; end if;
   update transactions set payment_status='PROOF_SUBMITTED', sender_name=btrim(p_sender_name),
     sender_account_number=btrim(p_sender_account_number), payment_proof_path=p_payment_proof_path,
-    payment_submitted_at=now() where id=v_tx.id;
+    payment_submitted_at=now() where transactions.id=v_tx.id;
   return query select v_tx.invoice_id, 'PROOF_SUBMITTED'::text;
 end $$;
 grant execute on function public.submit_payment_proof(text,text,text,text) to anon, authenticated;
