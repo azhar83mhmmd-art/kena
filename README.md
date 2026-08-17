@@ -1,4 +1,4 @@
-# ARRZ MARKET — Pure Supabase + Static Frontend + Vercel
+# KENARRZ MARKET — Pure Supabase + Static Frontend + Vercel
 
 Marketplace jual beli akun digital. Tidak ada lagi server Node.js yang
 berjalan terus-menerus — semua backend (database, auth, realtime, storage)
@@ -96,10 +96,18 @@ di-hardcode di HTML/JS.
 
 ### Cara menjalankan migration
 
-Buka project Supabase → **SQL Editor** → New query → tempel isi
-`supabase/migration_manual_qris.sql` → Run. Jalankan sekali; aman
-dijalankan ulang kalau perlu (semua `IF NOT EXISTS` / `DROP POLICY IF
-EXISTS`).
+Buka project Supabase → **SQL Editor** → New query → jalankan berurutan:
+
+1. `supabase/schema.sql`
+2. `supabase/migration_pure_supabase.sql`
+3. `supabase/migration_manual_qris.sql`
+4. `supabase/migration_v3_kenarrz_upgrade.sql` — **wajib**, berisi sistem
+   diskon, tabel kredensial akun (`account_credentials`), RPC
+   `complete_transaction` & `get_purchased_account_credentials`, dan
+   perubahan prefix invoice jadi `KNZ-`.
+
+Semua migration aman dijalankan ulang kalau perlu (`IF NOT EXISTS` /
+`DROP POLICY IF EXISTS` / `CREATE OR REPLACE`).
 
 ### Cara test di Vercel production
 
@@ -134,12 +142,13 @@ server karena semua konfigurasi ada di `public/js/supabase-client.js`.
 ## Struktur proyek
 
 ```
-arrz-market/
+kenarrz-market/
 ├── vercel.json                  # deploy static dari folder public/
 ├── supabase/
-│   ├── schema.sql                    # skema tabel dasar
-│   ├── migration_pure_supabase.sql   # RLS admin, trigger, realtime, storage
-│   └── migration_manual_qris.sql     # sistem pembayaran QRIS DANA Bisnis manual
+│   ├── schema.sql                      # skema tabel dasar
+│   ├── migration_pure_supabase.sql     # RLS admin, trigger, realtime, storage
+│   ├── migration_manual_qris.sql       # sistem pembayaran QRIS DANA Bisnis manual
+│   └── migration_v3_kenarrz_upgrade.sql # diskon, kredensial akun aman, selesaikan pesanan
 └── public/
     ├── index.html, shop.html, product.html, sell.html, payment.html,
     │   login.html, faq.html, how-it-works.html, admin.html
